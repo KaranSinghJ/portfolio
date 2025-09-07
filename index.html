@@ -25,6 +25,9 @@
             overflow-x: hidden;
             cursor: none;
         }
+        body.modal-open {
+            overflow: hidden;
+        }
 
         .aurora-background {
             position: fixed;
@@ -43,77 +46,57 @@
             opacity: 0.3;
         }
 
-        .shape1 {
-            width: 500px;
-            height: 500px;
-            background: #0077ff;
-            top: -150px;
-            left: -150px;
-            animation: move1 20s infinite alternate;
-        }
-
-        .shape2 {
-            width: 400px;
-            height: 400px;
-            background: #ff00c3;
-            bottom: -100px;
-            right: -100px;
-            animation: move2 25s infinite alternate;
-        }
-
-        .shape3 {
-            width: 300px;
-            height: 300px;
-            background: #00ff88;
-            bottom: 50px;
-            left: 150px;
-            animation: move3 15s infinite alternate;
-        }
+        .shape1 { width: 500px; height: 500px; background: #0077ff; top: -150px; left: -150px; animation: move1 20s infinite alternate; }
+        .shape2 { width: 400px; height: 400px; background: #ff00c3; bottom: -100px; right: -100px; animation: move2 25s infinite alternate; }
+        .shape3 { width: 300px; height: 300px; background: #00ff88; bottom: 50px; left: 150px; animation: move3 15s infinite alternate; }
 
         @keyframes move1 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(200px, 100px) rotate(360deg); } }
         @keyframes move2 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(-150px, -50px) rotate(180deg); } }
         @keyframes move3 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(50px, -150px) rotate(-180deg); } }
 
-        .glass-card {
-            background: rgba(22, 27, 34, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
+        .glass-card { background: rgba(22, 27, 34, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .section { scroll-margin-top: 80px; }
         .nav-link.active-nav { color: #58a6ff; font-weight: 600; }
         .typed-cursor { font-size: 2.25rem; color: #58a6ff; }
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1s ease, transform 1s ease;
-        }
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s ease; }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Custom Cursor */
-        .cursor-dot, .cursor-outline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.2s;
-        }
+        .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; transition: opacity 0.3s, transform 0.2s; }
         .cursor-dot { width: 8px; height: 8px; background-color: #58a6ff; }
         .cursor-outline { width: 30px; height: 30px; border: 2px solid #58a6ff; }
 
-        .scroll-down {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-            animation: bounce 2s infinite;
-        }
+        .scroll-down { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 5; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); } 40% { transform: translate(-50%, -20px); } 60% { transform: translate(-50%, -10px); } }
+        
+        /* Project Modal Styles */
+        #project-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        #project-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        #project-modal {
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #project-modal-overlay.visible #project-modal {
+            transform: scale(1);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -204,38 +187,14 @@
                 <p class="text-slate-400 mt-2">My technical level</p>
             </div>
             <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fab fa-java text-6xl text-sky-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">Core Java</h3>
-                </div>
-                 <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fas fa-database text-6xl text-sky-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">SQL</h3>
-                </div>
-                <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fab fa-html5 text-6xl text-orange-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">HTML & CSS</h3>
-                </div>
-                <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fab fa-js-square text-6xl text-yellow-300" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">JavaScript</h3>
-                </div>
-                 <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fab fa-python text-6xl text-green-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">Python</h3>
-                </div>
-                 <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fas fa-robot text-6xl text-purple-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">AI / Prompt Eng.</h3>
-                </div>
-                 <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fas fa-project-diagram text-6xl text-teal-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">OOP</h3>
-                </div>
-                 <div class="text-center p-4 reveal glass-card rounded-xl">
-                    <i class="fas fa-cogs text-6xl text-gray-400" aria-hidden="true"></i>
-                    <h3 class="mt-4 font-bold text-lg text-white">JDBC/Servlets</h3>
-                </div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-java text-6xl text-sky-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">Core Java</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-database text-6xl text-sky-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">SQL</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-html5 text-6xl text-orange-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">HTML & CSS</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-js-square text-6xl text-yellow-300" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">JavaScript</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-python text-6xl text-green-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">Python</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-robot text-6xl text-purple-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">AI / Prompt Eng.</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-project-diagram text-6xl text-teal-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">OOP</h3></div>
+                <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-cogs text-6xl text-gray-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-white">JDBC/Servlets</h3></div>
             </div>
         </section>
 
@@ -246,7 +205,6 @@
                 <p class="text-slate-400 mt-2">My professional work</p>
             </div>
             <div class="max-w-3xl mx-auto relative pl-4 border-l-2 border-slate-700">
-                <!-- Experience 1 -->
                 <article class="mb-12 pl-8 relative reveal">
                      <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4 border-slate-800"></div>
                      <p class="text-sm font-semibold text-slate-400">Dec 2023 - Dec 2024</p>
@@ -257,7 +215,6 @@
                         <li>Assisted in maintaining precise records and documentation for auditing purposes.</li>
                      </ul>
                 </article>
-                 <!-- Experience 2 -->
                 <article class="pl-8 relative reveal">
                      <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4 border-slate-800"></div>
                      <p class="text-sm font-semibold text-slate-400">Jul 2022 - Jan 2023</p>
@@ -279,18 +236,16 @@
                 <p class="text-slate-400 mt-2">My academic background</p>
             </div>
             <div class="max-w-3xl mx-auto relative pl-4 border-l-2 border-slate-700">
-                 <!-- Education 1 -->
                 <div class="mb-12 pl-8 relative reveal">
                     <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4 border-slate-800"></div>
                      <p class="text-sm font-semibold text-slate-400">Ongoing - 2026</p>
                      <h3 class="text-xl font-bold mt-1 text-white">M.Tech, Computer Science</h3>
                      <p class="text-slate-300 font-medium">Rajarajeswari College of Engineering</p>
                 </div>
-                 <!-- Education 2 -->
                  <div class="pl-8 relative reveal">
                      <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4 border-slate-800"></div>
                      <p class="text-sm font-semibold text-slate-400">Graduated - 2022</p>
-                     <h3 class="text-xl font-bold mt-1 text-white">B.E, Information Science</h3>
+                     <h3 class="text-xl font-bold mt-1 text-white">B.Tech, Computer Science</h3>
                      <p class="text-slate-300 font-medium">Visvesvaraya Technological University</p>
                 </div>
             </div>
@@ -304,43 +259,50 @@
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <!-- Project 1 -->
-                <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col">
-                    <img src="assets/project-1.jpg" alt="Futuristic car with a heads-up display showing vehicle monitoring data." class="w-full h-56 object-cover">
-                    <div class="p-6 flex flex-col flex-grow">
+                <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer" 
+                    data-title="Smart Vehicle Monitoring"
+                    data-img="assets/project-1.jpg"
+                    data-description="This project is an end-to-end IoT solution for real-time vehicle tracking and data analysis. It involved integrating various sensors with microcontrollers for data acquisition and utilizing the MQTT protocol for efficient, low-latency data transmission to a central server. The goal was to create a comprehensive dashboard for users to monitor vehicle status, location, and performance metrics."
+                    data-tech="IoT,C/C++,Python,MQTT"
+                    data-github="none">
+                    <img src="assets/project-1.jpg" alt="Futuristic car with a heads-up display showing vehicle monitoring data." class="w-full h-56 object-cover pointer-events-none">
+                    <div class="p-6 flex flex-col flex-grow pointer-events-none">
                         <h3 class="font-bold text-xl mb-2 text-white">Smart Vehicle Monitoring</h3>
                         <p class="text-slate-300 text-sm mb-4 flex-grow">IoT-based system for real-time vehicle data acquisition and analysis.</p>
-                        <div class="flex flex-wrap gap-2 text-sm">
-                            <span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">IoT</span>
-                        </div>
+                        <div class="flex flex-wrap gap-2 text-sm mt-auto"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">IoT</span></div>
                     </div>
                 </article>
                  <!-- Project 2 -->
-                <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col">
-                    <img src="assets/project-2.jpg" alt="Conceptual art of a human head with neural network lines, representing mental health detection through AI." class="w-full h-56 object-cover">
-                    <div class="p-6 flex flex-col flex-grow">
+                <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer"
+                    data-title="Mental Health Detection"
+                    data-img="assets/project-2.jpg"
+                    data-description="A machine learning project designed to detect potential mental health issues like depression and anxiety through non-invasive means. The system analyzes speech patterns and biosignals, processing them through a Convolutional Neural Network (CNN) to identify emotional states. This project explores the intersection of AI and healthcare, aiming to provide an early-warning system."
+                    data-tech="Machine Learning,CNN,Speech Recognition,Python"
+                    data-github="https://github.com/KaranSinghJ">
+                    <img src="assets/project-2.jpg" alt="Conceptual art of a human head with neural network lines, representing mental health detection through AI." class="w-full h-56 object-cover pointer-events-none">
+                    <div class="p-6 flex flex-col flex-grow pointer-events-none">
                         <h3 class="font-bold text-xl mb-2 text-white">Mental Health Detection</h3>
                         <p class="text-slate-300 text-sm mb-4 flex-grow">Detects mental health states using ML models and speech recognition.</p>
                         <div class="mt-auto flex justify-between items-center">
-                            <div class="flex flex-wrap gap-2 text-sm">
-                                <span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">ML</span>
-                                <span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">CNN</span>
-                            </div>
-                            <a href="https://github.com/KaranSinghJ" target="_blank" class="text-sky-400 hover:text-sky-300 text-2xl" aria-label="View the Mental Health Detection project on GitHub"><i class="fab fa-github"></i></a>
+                            <div class="flex flex-wrap gap-2 text-sm"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">ML</span><span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">CNN</span></div>
+                            <span class="text-sky-400 text-2xl"><i class="fab fa-github"></i></span>
                         </div>
                     </div>
                 </article>
                  <!-- Project 3 -->
-                <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col">
-                    <img src="assets/project-3.jpg" alt="A smartphone displaying a proximity marketing notification inside a shopping mall." class="w-full h-56 object-cover">
-                    <div class="p-6 flex flex-col flex-grow">
+                <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer"
+                    data-title="Proximity Marketing System"
+                    data-img="assets/project-3.jpg"
+                    data-description="This system delivers targeted advertisements to users based on their proximity to retail locations while prioritizing user privacy. The backend, built with FastAPI, uses machine learning for ad prediction. A ReactJS admin dashboard allows for campaign management, and a smart contract simulator was developed to manage a token-based reward system, ensuring transparency and security."
+                    data-tech="FastAPI,ReactJS,Python,Smart Contracts"
+                    data-github="https://github.com/KaranSinghJ">
+                    <img src="assets/project-3.jpg" alt="A smartphone displaying a proximity marketing notification inside a shopping mall." class="w-full h-56 object-cover pointer-events-none">
+                    <div class="p-6 flex flex-col flex-grow pointer-events-none">
                         <h3 class="font-bold text-xl mb-2 text-white">Proximity Marketing System</h3>
                         <p class="text-slate-300 text-sm mb-4 flex-grow">Privacy-aware marketing with FastAPI, ReactJS, and Smart Contracts.</p>
                         <div class="mt-auto flex justify-between items-center">
-                             <div class="flex flex-wrap gap-2 text-sm">
-                                <span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">FastAPI</span>
-                                <span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">ReactJS</span>
-                            </div>
-                            <a href="https://github.com/KaranSinghJ" target="_blank" class="text-sky-400 hover:text-sky-300 text-2xl" aria-label="View the Proximity Marketing System project on GitHub"><i class="fab fa-github"></i></a>
+                             <div class="flex flex-wrap gap-2 text-sm"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">FastAPI</span><span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">ReactJS</span></div>
+                            <span class="text-sky-400 text-2xl"><i class="fab fa-github"></i></span>
                         </div>
                     </div>
                 </article>
@@ -354,34 +316,10 @@
                 <p class="text-slate-400 mt-2">My professional credentials</p>
             </div>
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal">
-                    <i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i>
-                    <div>
-                        <h3 class="font-bold text-lg text-white">Full Stack Java Developer</h3>
-                        <p class="text-slate-400 text-sm">JSpiders</p>
-                    </div>
-                </article>
-                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal">
-                    <i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i>
-                    <div>
-                        <h3 class="font-bold text-lg text-white">Android App Development</h3>
-                         <p class="text-slate-400 text-sm">Internshala</p>
-                    </div>
-                </article>
-                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal">
-                    <i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i>
-                    <div>
-                        <h3 class="font-bold text-lg text-white">Python using AI</h3>
-                        <p class="text-slate-400 text-sm">AI Techies</p>
-                    </div>
-                </article>
-                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal">
-                    <i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i>
-                    <div>
-                        <h3 class="font-bold text-lg text-white">Python for Beginners</h3>
-                        <p class="text-slate-400 text-sm">Simplilearn</p>
-                    </div>
-                </article>
+                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal"><i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i><div><h3 class="font-bold text-lg text-white">Full Stack Java Developer</h3><p class="text-slate-400 text-sm">JSpiders</p></div></article>
+                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal"><i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i><div><h3 class="font-bold text-lg text-white">Android App Development</h3><p class="text-slate-400 text-sm">Internshala</p></div></article>
+                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal"><i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i><div><h3 class="font-bold text-lg text-white">Python using AI</h3><p class="text-slate-400 text-sm">AI Techies</p></div></article>
+                <article class="project-card glass-card p-6 rounded-xl flex items-center gap-4 reveal"><i class="fas fa-certificate text-4xl text-sky-400" aria-hidden="true"></i><div><h3 class="font-bold text-lg text-white">Python for Beginners</h3><p class="text-slate-400 text-sm">Simplilearn</p></div></article>
             </div>
         </section>
 
@@ -393,18 +331,9 @@
             </div>
             <div class="max-w-2xl mx-auto glass-card rounded-2xl p-8 reveal">
                  <form id="contact-form" action="https://formspree.io/f/xandankw" method="POST" class="space-y-6">
-                    <div>
-                        <label for="name" class="sr-only">Your Name</label>
-                        <input id="name" type="text" name="name" placeholder="Your Name" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required>
-                    </div>
-                    <div>
-                        <label for="email" class="sr-only">Your Email</label>
-                        <input id="email" type="email" name="email" placeholder="Your Email" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required>
-                    </div>
-                    <div>
-                         <label for="message" class="sr-only">Your Message</label>
-                        <textarea id="message" name="message" placeholder="Your Message" rows="6" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></textarea>
-                    </div>
+                    <div><label for="name" class="sr-only">Your Name</label><input id="name" type="text" name="name" placeholder="Your Name" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div>
+                    <div><label for="email" class="sr-only">Your Email</label><input id="email" type="email" name="email" placeholder="Your Email" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div>
+                    <div><label for="message" class="sr-only">Your Message</label><textarea id="message" name="message" placeholder="Your Message" rows="6" class="w-full p-4 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></textarea></div>
                     <button type="submit" class="w-full bg-sky-500 text-white font-bold py-4 rounded-lg hover:bg-sky-600 transition-all shadow-[0_0_20px_rgba(56,189,248,0.5)]">Send Message</button>
                     <p id="form-status" class="text-center text-sm mt-4"></p>
                 </form>
@@ -417,10 +346,7 @@
         <div class="container mx-auto text-center">
             <h3 class="text-2xl font-bold text-white mb-2">Karan Singh J</h3>
             <p class="mb-4">Java Full Stack Developer</p>
-            <div class="mb-6">
-                <h4 class="font-semibold text-white mb-2">Languages</h4>
-                <p>English, Hindi, Kannada</p>
-            </div>
+            <div class="mb-6"><h4 class="font-semibold text-white mb-2">Languages</h4><p>English, Hindi, Kannada</p></div>
             <div class="flex justify-center space-x-6">
                 <a href="https://www.linkedin.com/in/karan-singh-j-14ab09204/" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400 transition-colors text-2xl" aria-label="View Karan's LinkedIn profile"><i class="fab fa-linkedin"></i></a>
                 <a href="https://github.com/KaranSinghJ" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400 transition-colors text-2xl" aria-label="View Karan's GitHub profile"><i class="fab fa-github"></i></a>
@@ -428,6 +354,26 @@
             <p class="mt-8 text-sm text-slate-500">&copy; 2025 Karan Singh J. All rights reserved.</p>
         </div>
     </footer>
+    
+    <!-- Project Modal -->
+    <div id="project-modal-overlay">
+        <div id="project-modal" class="glass-card rounded-2xl p-8 max-w-3xl w-11/12 relative max-h-[90vh] overflow-y-auto">
+            <button id="modal-close-btn" class="absolute top-4 right-5 text-3xl text-slate-400 hover:text-white transition-colors" aria-label="Close project details modal">&times;</button>
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2">
+                    <img id="modal-image" src="" alt="Project screenshot" class="rounded-lg w-full object-cover">
+                </div>
+                <div class="md:w-1/2">
+                    <h2 id="modal-title" class="text-3xl font-bold text-white mb-4"></h2>
+                    <p id="modal-description" class="text-slate-300 mb-6"></p>
+                    <h3 class="font-semibold text-white mb-3">Technologies Used:</h3>
+                    <div id="modal-tech-tags" class="flex flex-wrap gap-2 mb-6"></div>
+                    <a id="modal-github-link" href="#" target="_blank" class="inline-block bg-slate-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-slate-600 transition-all"><i class="fab fa-github mr-2"></i>View on GitHub</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- JS Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
@@ -453,21 +399,10 @@
         });
 
         // --- Typed.js Initialization ---
-        new Typed('#typed-text', {
-            strings: ['Java Full Stack Developer', 'Backend Specialist', 'AI Enthusiast'],
-            typeSpeed: 70,
-            backSpeed: 50,
-            loop: true,
-            smartBackspace: true,
-        });
+        new Typed('#typed-text', { strings: ['Java Full Stack Developer', 'Backend Specialist', 'AI Enthusiast'], typeSpeed: 70, backSpeed: 50, loop: true, smartBackspace: true });
         
         // --- 3D Tilt Effect ---
-        VanillaTilt.init(document.querySelectorAll(".project-card"), {
-            max: 15,
-            speed: 400,
-            glare: true,
-            "max-glare": 0.2
-        });
+        VanillaTilt.init(document.querySelectorAll(".project-card, .glass-card"), { max: 5, speed: 400, glare: true, "max-glare": 0.1 });
         
         // --- Mobile Menu Toggle ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -476,11 +411,7 @@
             const isExpanded = mobileMenu.classList.toggle('hidden');
             mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
         });
-        mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            mobileMenuButton.setAttribute('aria-expanded', 'false');
-        }));
-
+        mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { mobileMenu.classList.add('hidden'); mobileMenuButton.setAttribute('aria-expanded', 'false'); }));
 
         // --- Scroll-based Features ---
         const reveals = document.querySelectorAll('.reveal');
@@ -488,27 +419,17 @@
         const navLinks = document.querySelectorAll('.nav-link');
 
         function handleScroll() {
-            // Reveal elements with stagger
             reveals.forEach((el, index) => {
-                if (el.getBoundingClientRect().top < window.innerHeight - 100) {
-                    el.style.transitionDelay = `${index * 50}ms`;
-                    el.classList.add('active');
-                }
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) { el.style.transitionDelay = `${index * 50}ms`; el.classList.add('active'); }
             });
-            // Active nav link
             let currentSectionId = '';
-            sections.forEach(section => {
-                if (window.scrollY >= section.offsetTop - 100) { currentSectionId = section.id; }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active-nav');
-                if (link.getAttribute('href') === `#${currentSectionId}`) { link.classList.add('active-nav'); }
-            });
+            sections.forEach(section => { if (window.scrollY >= section.offsetTop - 100) { currentSectionId = section.id; } });
+            navLinks.forEach(link => { link.classList.remove('active-nav'); if (link.getAttribute('href') === `#${currentSectionId}`) { link.classList.add('active-nav'); } });
         }
         window.addEventListener('scroll', handleScroll);
         handleScroll();
 
-         // --- Contact Form ---
+        // --- Contact Form ---
         const form = document.getElementById('contact-form');
         const formStatus = document.getElementById('form-status');
         form.addEventListener("submit", async (event) => {
@@ -530,59 +451,91 @@
             }
         });
 
+        // --- Project Modal Logic ---
+        const modalOverlay = document.getElementById('project-modal-overlay');
+        const modal = document.getElementById('project-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        const modalImage = document.getElementById('modal-image');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+        const modalTechTags = document.getElementById('modal-tech-tags');
+        const modalGithubLink = document.getElementById('modal-github-link');
+        
+        function openModal(data) {
+            modalImage.src = data.img;
+            modalImage.alt = `Screenshot of the ${data.title} project.`;
+            modalTitle.textContent = data.title;
+            modalDescription.textContent = data.description;
+
+            modalTechTags.innerHTML = '';
+            const techs = data.tech.split(',');
+            techs.forEach(tech => {
+                const tag = document.createElement('span');
+                tag.className = 'bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium text-sm';
+                tag.textContent = tech.trim();
+                modalTechTags.appendChild(tag);
+            });
+
+            if (data.github && data.github !== 'none') {
+                modalGithubLink.href = data.github;
+                modalGithubLink.style.display = 'inline-block';
+            } else {
+                modalGithubLink.style.display = 'none';
+            }
+
+            modalOverlay.classList.add('visible');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('visible');
+            document.body.classList.remove('modal-open');
+        }
+
+        projectCards.forEach(card => {
+            // Check if it is a project card and not a certification card
+            if(card.hasAttribute('data-title')) {
+                 card.addEventListener('click', () => {
+                    openModal(card.dataset);
+                });
+            }
+        });
+
+        modalCloseBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('visible')) {
+                closeModal();
+            }
+        });
+
         // --- Three.js Scene ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('three-canvas').appendChild(renderer.domElement);
-
         const geometry = new THREE.IcosahedronGeometry(1, 0);
-        const material = new THREE.MeshStandardMaterial({
-            color: 0x228be6,
-            wireframe: true,
-            roughness: 0.5,
-            metalness: 0.5
-        });
+        const material = new THREE.MeshStandardMaterial({ color: 0x228be6, wireframe: true, roughness: 0.5, metalness: 0.5 });
         const shape = new THREE.Mesh(geometry, material);
         scene.add(shape);
-
         const light = new THREE.DirectionalLight(0xffffff, 1);
         light.position.set(5, 5, 5);
         scene.add(light);
         const ambientLight = new THREE.AmbientLight(0x404040, 2);
         scene.add(ambientLight);
-
         camera.position.z = 3;
-
         let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            shape.rotation.x += 0.001;
-            shape.rotation.y += 0.001;
-            
-            // Interaction
-            if (shape.rotation.x > -1.5) {
-                shape.rotation.x += (mouseY * 0.5 - shape.rotation.x) * 0.05;
-            }
-            if (shape.rotation.y < 1.5) {
-                shape.rotation.y += (mouseX * 0.5 - shape.rotation.y) * 0.05;
-            }
-
-            renderer.render(scene, camera);
-        }
+        document.addEventListener('mousemove', (event) => { mouseX = (event.clientX / window.innerWidth) * 2 - 1; mouseY = -(event.clientY / window.innerHeight) * 2 + 1; });
+        function animate() { requestAnimationFrame(animate); shape.rotation.x += 0.001; shape.rotation.y += 0.001; if (shape.rotation.x > -1.5) { shape.rotation.x += (mouseY * 0.5 - shape.rotation.x) * 0.05; } if (shape.rotation.y < 1.5) { shape.rotation.y += (mouseX * 0.5 - shape.rotation.y) * 0.05; } renderer.render(scene, camera); }
         animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
     });
     </script>
 </body>
