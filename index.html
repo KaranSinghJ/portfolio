@@ -93,6 +93,12 @@
         #project-modal-overlay.visible { opacity: 1; visibility: visible; }
         #project-modal { transform: scale(0.95); transition: transform 0.3s ease; }
         #project-modal-overlay.visible #project-modal { transform: scale(1); }
+
+        /* Timeline Animation */
+        .timeline-line { position: absolute; left: -1px; top: 0; width: 2px; height: 100%; background-color: var(--timeline-border); transform-origin: top; transform: scaleY(0); transition: transform 1.5s ease-in-out; }
+        .timeline-line.in-view { transform: scaleY(1); }
+        .timeline-item { opacity: 0; transform: translateX(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .timeline-item.in-view { opacity: 1; transform: translateX(0); }
     </style>
 </head>
 <body class="antialiased loading">
@@ -118,9 +124,9 @@
                 <a href="#home" class="text-2xl font-bold text-headings">Karan.</a>
                 <div class="hidden md:flex space-x-6 items-center" role="navigation" aria-label="main navigation">
                     <a href="#about" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">About</a>
+                    <a href="#services" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Services</a>
                     <a href="#skills" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Skills</a>
                     <a href="#experience" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Experience</a>
-                    <a href="#education" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Education</a>
                     <a href="#projects" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Projects</a>
                     <a href="#certifications" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Certifications</a>
                     <a href="#contact" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Contact</a>
@@ -139,9 +145,9 @@
             </nav>
             <div id="mobile-menu" class="hidden md:hidden glass-card border-t" style="border-color: var(--card-border);">
                 <a href="#about" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">About</a>
+                <a href="#services" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Services</a>
                 <a href="#skills" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Skills</a>
                 <a href="#experience" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Experience</a>
-                <a href="#education" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Education</a>
                 <a href="#projects" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Projects</a>
                 <a href="#certifications" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Certifications</a>
                 <a href="#contact" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Contact</a>
@@ -187,11 +193,57 @@
                 </div>
             </section>
 
+            <!-- Services Section -->
+            <section id="services" class="py-24 section">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl font-bold text-headings">What I Do</h2>
+                    <p class="text-secondary mt-2">The value I bring to your team</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Service 1: Backend -->
+                    <div class="glass-card rounded-2xl p-8 text-center reveal">
+                        <i class="fas fa-server text-5xl mb-4" style="color: var(--accent-color);"></i>
+                        <h3 class="text-2xl font-bold text-headings mb-3">Backend Development</h3>
+                        <p class="text-primary mb-4" style="color: var(--text-primary);">Building robust, scalable, and secure server-side applications.</p>
+                        <ul class="text-secondary">
+                            <li>Java & Spring Boot</li>
+                            <li>REST APIs & Microservices</li>
+                            <li>SQL & Database Design</li>
+                            <li>Object-Oriented Programming</li>
+                        </ul>
+                    </div>
+                     <!-- Service 2: Frontend -->
+                    <div class="glass-card rounded-2xl p-8 text-center reveal">
+                        <i class="fas fa-code text-5xl mb-4" style="color: var(--accent-color);"></i>
+                        <h3 class="text-2xl font-bold text-headings mb-3">Frontend Development</h3>
+                        <p class="text-primary mb-4" style="color: var(--text-primary);">Creating responsive and intuitive user interfaces.</p>
+                        <ul class="text-secondary">
+                            <li>HTML5 & CSS3</li>
+                            <li>JavaScript</li>
+                            <li>Responsive Design</li>
+                            <li>User Experience</li>
+                        </ul>
+                    </div>
+                     <!-- Service 3: AI -->
+                    <div class="glass-card rounded-2xl p-8 text-center reveal">
+                        <i class="fas fa-brain text-5xl mb-4" style="color: var(--accent-color);"></i>
+                        <h3 class="text-2xl font-bold text-headings mb-3">AI & Prompt Engineering</h3>
+                        <p class="text-primary mb-4" style="color: var(--text-primary);">Leveraging AI to build innovative and intelligent solutions.</p>
+                        <ul class="text-secondary">
+                            <li>Machine Learning Concepts</li>
+                            <li>Python for AI</li>
+                            <li>Prompt Engineering</li>
+                            <li>AI Model Integration</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
             <!-- Skills Section -->
             <section id="skills" class="py-24 section">
                 <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">My Skills</h2>
-                    <p class="text-secondary mt-2">My technical level</p>
+                    <h2 class="text-4xl font-bold text-headings">Core Technologies</h2>
+                    <p class="text-secondary mt-2">The tools I work with</p>
                 </div>
                 <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
                     <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-java text-6xl text-sky-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">Core Java</h3></div>
@@ -199,7 +251,7 @@
                     <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-html5 text-6xl text-orange-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">HTML & CSS</h3></div>
                     <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-js-square text-6xl text-yellow-300" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">JavaScript</h3></div>
                     <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-python text-6xl text-green-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">Python</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-robot text-6xl text-purple-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">AI / Prompt Eng.</h3></div>
+                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-robot text-6xl text-purple-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">AI / ML</h3></div>
                     <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-project-diagram text-6xl text-teal-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">OOP</h3></div>
                     <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-cogs text-6xl text-gray-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">JDBC/Servlets</h3></div>
                 </div>
@@ -208,24 +260,26 @@
             <!-- Experience Section -->
             <section id="experience" class="py-24 section">
                 <div class="text-center mb-20 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Experience</h2>
-                    <p class="text-secondary mt-2">My professional work</p>
+                    <h2 class="text-4xl font-bold text-headings">Career Journey</h2>
+                    <p class="text-secondary mt-2">My professional experience and education</p>
                 </div>
-                <div class="max-w-3xl mx-auto relative pl-4 border-l-2" style="border-color: var(--timeline-border);">
-                    <article class="mb-12 pl-8 relative reveal">
+                <div id="timeline-container" class="max-w-3xl mx-auto relative pl-4">
+                    <div class="timeline-line"></div>
+                    <h3 class="timeline-item text-2xl font-bold text-headings mb-8 pl-8 relative"><i class="fas fa-briefcase mr-3 text-secondary"></i>Experience</h3>
+                    <article class="timeline-item mb-12 pl-8 relative">
                         <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
                         <p class="text-sm font-semibold text-secondary">Dec 2023 - Dec 2024</p>
-                        <h3 class="text-xl font-bold mt-1 text-headings">Assistant Income Tax Verification</h3>
+                        <h4 class="text-xl font-bold mt-1 text-headings">Assistant Income Tax Verification</h4>
                         <p class="text-primary font-medium mb-3" style="color: var(--text-primary);">PreciseVision Management Consultancy Services Pvt Ltd (On IBM payroll)</p>
                         <ul class="list-disc list-inside text-secondary space-y-2">
                             <li>Verified and validated income tax proof submissions, ensuring accuracy and compliance.</li>
                             <li>Assisted in maintaining precise records and documentation for auditing purposes.</li>
                         </ul>
                     </article>
-                    <article class="pl-8 relative reveal">
+                    <article class="timeline-item mb-12 pl-8 relative">
                         <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
                         <p class="text-sm font-semibold text-secondary">Jul 2022 - Jan 2023</p>
-                        <h3 class="text-xl font-bold mt-1 text-headings">Software Engineer</h3>
+                        <h4 class="text-xl font-bold mt-1 text-headings">Software Engineer</h4>
                         <p class="text-primary font-medium mb-3" style="color: var(--text-primary);">Scrupulous Enterprises</p>
                         <ul class="list-disc list-inside text-secondary space-y-2">
                             <li>Developed scalable microservices using Java and Spring Boot.</li>
@@ -233,28 +287,20 @@
                             <li>Redesigned web pages with HTML, CSS, and jQuery to improve user experience.</li>
                         </ul>
                     </article>
-                </div>
-            </section>
 
-            <!-- Education Section -->
-            <section id="education" class="py-24 section">
-                <div class="text-center mb-20 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Education</h2>
-                    <p class="text-secondary mt-2">My academic background</p>
-                </div>
-                <div class="max-w-3xl mx-auto relative pl-4 border-l-2" style="border-color: var(--timeline-border);">
-                    <div class="mb-12 pl-8 relative reveal">
+                    <h3 class="timeline-item text-2xl font-bold text-headings mb-8 mt-16 pl-8 relative"><i class="fas fa-graduation-cap mr-3 text-secondary"></i>Education</h3>
+                     <article class="timeline-item mb-12 pl-8 relative">
                         <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
                         <p class="text-sm font-semibold text-secondary">Ongoing - 2026</p>
-                        <h3 class="text-xl font-bold mt-1 text-headings">M.Tech, Computer Science</h3>
+                        <h4 class="text-xl font-bold mt-1 text-headings">M.Tech, Computer Science</h4>
                         <p class="text-primary font-medium" style="color: var(--text-primary);">Rajarajeswari College of Engineering</p>
-                    </div>
-                    <div class="pl-8 relative reveal">
+                    </article>
+                    <article class="timeline-item pl-8 relative">
                         <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
                         <p class="text-sm font-semibold text-secondary">Graduated - 2022</p>
-                        <h3 class="text-xl font-bold mt-1 text-headings">B.E, Computer Science</h3>
+                        <h4 class="text-xl font-bold mt-1 text-headings">B.E, Computer Science</h4>
                         <p class="text-primary font-medium" style="color: var(--text-primary);">Visvesvaraya Technological University</p>
-                    </div>
+                    </article>
                 </div>
             </section>
 
@@ -328,6 +374,7 @@
                     </form>
                 </div>
             </section>
+
         </main>
 
         <!-- Footer -->
@@ -373,15 +420,27 @@
     <!-- Main Script -->
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-
-        const reveals = document.querySelectorAll('.reveal');
+        // --- Function Definitions First ---
         const sections = document.querySelectorAll('section[id]');
         const navLinks = document.querySelectorAll('.nav-link');
+        const timelineContainer = document.getElementById('timeline-container');
 
         function handleScroll() {
-            reveals.forEach((el, index) => {
-                if (el.getBoundingClientRect().top < window.innerHeight - 100) { el.style.transitionDelay = `${index * 50}ms`; el.classList.add('active'); }
+            document.querySelectorAll('.reveal').forEach((el) => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) { 
+                    el.classList.add('active'); 
+                }
             });
+
+            if (timelineContainer && timelineContainer.getBoundingClientRect().top < window.innerHeight - 200) {
+                timelineContainer.querySelector('.timeline-line').classList.add('in-view');
+                timelineContainer.querySelectorAll('.timeline-item').forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('in-view');
+                    }, index * 200);
+                });
+            }
+
             let currentSectionId = '';
             sections.forEach(section => { if (window.scrollY >= section.offsetTop - 85) { currentSectionId = section.id; } });
             navLinks.forEach(link => { link.classList.remove('active-nav'); if (link.getAttribute('href') === `#${currentSectionId}`) { link.classList.add('active-nav'); } });
@@ -390,24 +449,22 @@
         // --- Preloader Logic ---
         const preloader = document.getElementById('preloader');
         const mainContent = document.querySelector('.main-content');
-        
         window.addEventListener('load', () => {
             setTimeout(() => {
                 preloader.classList.add('hidden');
                 document.body.classList.remove('loading');
                 mainContent.classList.add('loaded');
-                handleScroll(); // Initial call to reveal visible elements
+                handleScroll(); // Initial call
             }, 500);
         });
 
         // --- Theme Toggle ---
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeToggleMobileBtn = document.getElementById('theme-toggle-mobile');
-        const themeIcon = document.getElementById('theme-icon');
-        const themeIconMobile = document.getElementById('theme-icon-mobile');
         const root = document.documentElement;
-
         function applyTheme(theme) {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeIconMobile = document.getElementById('theme-icon-mobile');
             if (theme === 'light') {
                 root.classList.add('light-mode');
                 themeIcon.classList.replace('fa-moon', 'fa-sun');
@@ -418,20 +475,14 @@
                 themeIconMobile.classList.replace('fa-sun', 'fa-moon');
             }
         }
-
         function toggleTheme() {
-            const currentTheme = root.classList.contains('light-mode') ? 'light' : 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const newTheme = root.classList.contains('light-mode') ? 'dark' : 'light';
             localStorage.setItem('theme', newTheme);
             applyTheme(newTheme);
         }
-
         themeToggleBtn.addEventListener('click', toggleTheme);
         themeToggleMobileBtn.addEventListener('click', toggleTheme);
-
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
-
+        applyTheme(localStorage.getItem('theme') || 'dark');
         
         // --- Custom Cursor ---
         const cursorDot = document.querySelector('.cursor-dot');
@@ -443,8 +494,12 @@
             cursorOutline.style.top = e.clientY + 'px';
         });
         document.querySelectorAll('a, button, .project-card').forEach(el => {
-            el.addEventListener('mouseenter', () => cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)');
-            el.addEventListener('mouseleave', () => cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)');
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
+            });
         });
 
         // --- Typed.js Initialization ---
@@ -457,14 +512,19 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         mobileMenuButton.addEventListener('click', () => {
-            const isExpanded = mobileMenu.classList.toggle('hidden');
-            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('hidden');
+            mobileMenuButton.setAttribute('aria-expanded', !mobileMenu.classList.contains('hidden'));
         });
-        mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { mobileMenu.classList.add('hidden'); mobileMenuButton.setAttribute('aria-expanded', 'false'); }));
-
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            });
+        });
+        
         // --- Scroll Event Listener ---
         window.addEventListener('scroll', handleScroll);
-        
+
         // --- Contact Form ---
         const form = document.getElementById('contact-form');
         const formStatus = document.getElementById('form-status');
@@ -486,52 +546,43 @@
                 formStatus.className = 'text-center text-sm mt-4 text-red-400';
             }
         });
-
+        
         // --- Project Modal Logic ---
         const modalOverlay = document.getElementById('project-modal-overlay');
-        const modalCloseBtn = document.getElementById('modal-close-btn');
         const projectCards = document.querySelectorAll('.project-card');
-        const modalImage = document.getElementById('modal-image');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDescription = document.getElementById('modal-description');
-        const modalTechTags = document.getElementById('modal-tech-tags');
-        const modalGithubLink = document.getElementById('modal-github-link');
-        
         function openModal(data) {
-            modalImage.src = data.img;
-            modalImage.alt = `Screenshot of the ${data.title} project.`;
-            modalTitle.textContent = data.title;
-            modalDescription.textContent = data.description;
-            modalTechTags.innerHTML = '';
-            const techs = data.tech.split(',');
-            techs.forEach(tech => {
+            document.getElementById('modal-image').src = data.img;
+            document.getElementById('modal-image').alt = `Screenshot of the ${data.title} project.`;
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-description').textContent = data.description;
+            const techContainer = document.getElementById('modal-tech-tags');
+            techContainer.innerHTML = '';
+            data.tech.split(',').forEach(tech => {
                 const tag = document.createElement('span');
                 tag.className = 'bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium text-sm';
                 tag.textContent = tech.trim();
-                modalTechTags.appendChild(tag);
+                techContainer.appendChild(tag);
             });
+            const githubLink = document.getElementById('modal-github-link');
             if (data.github && data.github !== 'none') {
-                modalGithubLink.href = data.github;
-                modalGithubLink.style.display = 'inline-block';
+                githubLink.href = data.github;
+                githubLink.style.display = 'inline-block';
             } else {
-                modalGithubLink.style.display = 'none';
+                githubLink.style.display = 'none';
             }
             modalOverlay.classList.add('visible');
             document.body.classList.add('modal-open');
         }
-
         function closeModal() {
             modalOverlay.classList.remove('visible');
             document.body.classList.remove('modal-open');
         }
-
         projectCards.forEach(card => {
-            if(card.hasAttribute('data-title')) {
-                 card.addEventListener('click', () => { openModal(card.dataset); });
+            if(card.dataset.title) {
+                card.addEventListener('click', () => openModal(card.dataset));
             }
         });
-
-        modalCloseBtn.addEventListener('click', closeModal);
+        document.getElementById('modal-close-btn').addEventListener('click', closeModal);
         modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('visible')) closeModal(); });
 
@@ -553,7 +604,7 @@
         camera.position.z = 3;
         let mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', (event) => { mouseX = (event.clientX / window.innerWidth) * 2 - 1; mouseY = -(event.clientY / window.innerHeight) * 2 + 1; });
-        function animate() { requestAnimationFrame(animate); shape.rotation.x += 0.001; shape.rotation.y += 0.001; if (shape.rotation.x > -1.5) { shape.rotation.x += (mouseY * 0.5 - shape.rotation.x) * 0.05; } if (shape.rotation.y < 1.5) { shape.rotation.y += (mouseX * 0.5 - shape.rotation.y) * 0.05; } renderer.render(scene, camera); }
+        function animate() { requestAnimationFrame(animate); shape.rotation.x += 0.001; shape.rotation.y += 0.001; shape.rotation.x += (mouseY * 0.5 - shape.rotation.x) * 0.05; shape.rotation.y += (mouseX * 0.5 - shape.rotation.y) * 0.05; renderer.render(scene, camera); }
         animate();
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
     });
