@@ -13,790 +13,863 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- New Font: Outfit (More Modern/Tech) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #0d1117;
-            --text-primary: #c9d1d9;
-            --text-secondary: #8b949e;
-            --text-headings: #ffffff;
-            --accent-color: #58a6ff;
-            --card-bg: rgba(22, 27, 34, 0.6);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --header-bg: rgba(13, 17, 23, 0.5);
-            --timeline-border: #30363d;
+            --bg-color: #030712; /* Darker, richer background (Gray-950) */
+            --card-bg: #111827;   /* Gray-900 */
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --accent-primary: #6366f1; /* Indigo-500 */
+            --accent-secondary: #ec4899; /* Pink-500 */
+            --accent-glow: rgba(99, 102, 241, 0.5);
         }
 
         html.light-mode {
-            --bg-color: #f0f2f5;
-            --text-primary: #4a5568;
-            --text-secondary: #718096;
-            --text-headings: #1a202c;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --card-border: rgba(0, 0, 0, 0.1);
-            --header-bg: rgba(255, 255, 255, 0.7);
-            --timeline-border: #cbd5e0;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             overflow-x: hidden;
-            /* MODIFICATION: Removed cursor: none; for accessibility */
             transition: background-color 0.3s ease, color 0.3s ease;
+            /* Cyber Grid Background */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
-        body.modal-open, body.loading {
+
+        /* Vignette mask for the grid */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-color) 90%);
+            pointer-events: none;
+            z-index: -1;
+            position: fixed;
+        }
+
+        body.modal-open, body.loading { overflow: hidden; }
+
+        /* --- MODERN CARD STYLE (Glow Border) --- */
+        .modern-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             overflow: hidden;
         }
+        
+        html.light-mode .modern-card {
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
 
-        /* Preloader Styles */
-        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out; }
-        #preloader.hidden { opacity: 0; visibility: hidden; }
-        .preloader-logo { font-size: 3rem; font-weight: 800; color: var(--accent-color); animation: pulse 1.5s infinite ease-in-out; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
-        .main-content { opacity: 0; transition: opacity 0.5s ease-in-out; }
-        .main-content.loaded { opacity: 1; }
+        /* Gradient Border Glow on Hover */
+        .modern-card::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            z-index: -1;
+            background: conic-gradient(
+                from 0deg, 
+                transparent 0deg, 
+                transparent 90deg, 
+                var(--accent-primary) 180deg, 
+                var(--accent-secondary) 270deg, 
+                transparent 360deg
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: spin 4s linear infinite;
+        }
 
-        .aurora-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .aurora-shape { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; }
-        .shape1 { width: 500px; height: 500px; background: #0077ff; top: -150px; left: -150px; animation: move1 20s infinite alternate; }
-        .shape2 { width: 400px; height: 400px; background: #ff00c3; bottom: -100px; right: -100px; animation: move2 25s infinite alternate; }
-        .shape3 { width: 300px; height: 300px; background: #00ff88; bottom: 50px; left: 150px; animation: move3 15s infinite alternate; }
-        @keyframes move1 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(200px, 100px) rotate(360deg); } }
-        @keyframes move2 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(-150px, -50px) rotate(180deg); } }
-        @keyframes move3 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(50px, -150px) rotate(-180deg); } }
-
-        .glass-card {
+        .modern-card::after {
+            content: "";
+            position: absolute;
+            inset: 1px;
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--card-border);
-            /* MODIFICATION: Added box-shadow and transition for it */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        /* MODIFICATION: Added light mode and hover states for new shadow */
-        html.light-mode .glass-card {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
-        .glass-card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
-        html.light-mode .glass-card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            border-radius: 0.9rem;
+            z-index: -1;
         }
 
-        .section { scroll-margin-top: 80px; }
-        .nav-link.active-nav { color: var(--accent-color); font-weight: 600; }
-        .typed-cursor { font-size: 2.25rem; color: var(--accent-color); }
+        .modern-card:hover::before {
+            opacity: 1;
+        }
+        
+        .modern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px var(--accent-glow);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Image Zoom inside card */
+        .modern-card img {
+            transition: transform 0.5s ease;
+        }
+        .modern-card:hover img {
+            transform: scale(1.05);
+        }
+
+
+        /* Typography & Layout */
+        .section { scroll-margin-top: 100px; }
+        
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent-primary);
+        }
+        .nav-link.active-nav { 
+            background: var(--accent-primary); 
+            color: white; 
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
         .text-headings { color: var(--text-headings); }
         .text-secondary { color: var(--text-secondary); }
 
-        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s ease; }
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .gradient-text-accent {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; transition: opacity 0.3s, transform 0.2s; }
-        .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
+        /* Preloader */
+        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+        #preloader.hidden { opacity: 0; visibility: hidden; }
+        .loader-bar { width: 40px; height: 40px; border: 3px solid var(--accent-primary); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+
+        /* Cursor */
+        .cursor-dot { 
+            width: 10px; height: 10px; background: var(--accent-primary); border-radius: 50%; 
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+        }
         .cursor-outline {
-            width: 30px;
-            height: 30px;
-            border: 2px solid var(--accent-color);
-            /* MODIFICATION: Toned down opacity */
-            opacity: 0.5;
+            width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 50%;
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); pointer-events: none; z-index: 9998;
+            transition: transform 0.15s ease-out, width 0.2s, height 0.2s;
+        }
+        body:hover .cursor-outline { opacity: 1; }
+        
+        /* Back To Top Button */
+        #back-to-top {
+            position: fixed; bottom: 2rem; right: 2rem; 
+            background: var(--accent-primary); color: white;
+            width: 3rem; height: 3rem; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 50;
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+        #back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        #back-to-top:hover { transform: translateY(-5px); background: var(--accent-secondary); }
+
+        @media (max-width: 768px) {
+            .cursor-dot, .cursor-outline { display: none; }
+            .modern-card:hover { transform: none; }
+            #back-to-top { bottom: 1rem; right: 1rem; }
         }
 
-        .scroll-down { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 5; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); } 40% { transform: translate(-50%, -20px); } 60% { transform: translate(-50%, -10px); } }
-        
-        #project-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; backdrop-filter: blur(5px); }
-        html.light-mode #project-modal-overlay { background-color: rgba(255, 255, 255, 0.8); }
+        /* Modal */
+        #project-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; }
         #project-modal-overlay.visible { opacity: 1; visibility: visible; }
-        #project-modal { transform: scale(0.95); transition: transform 0.3s ease; }
+        #project-modal { transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         #project-modal-overlay.visible #project-modal { transform: scale(1); }
-
-        /* Timeline Animation */
-        .timeline-line { position: absolute; left: -1px; top: 0; width: 2px; height: 100%; background-color: var(--timeline-border); transform-origin: top; transform: scaleY(0); transition: transform 1.5s ease-in-out; }
-        .timeline-line.in-view { transform: scaleY(1); }
-        .timeline-item { opacity: 0; transform: translateX(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
-        .timeline-item.in-view { opacity: 1; transform: translateX(0); }
-
-
-        /* --- Accessibility & Polish Upgrades (Consolidated) --- */
-
-        /* 1. Hide custom cursor on mobile */
-        @media (max-width: 767px) {
-            .cursor-dot, .cursor-outline {
-                display: none;
-            }
-        }
-        
-        /* 2. Screen reader utility */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
-        }
-
-        /* 3. Keyboard Focus Ring */
-        a:focus-visible,
-        button:focus-visible,
-        [role="button"]:focus-visible,
-        .project-card:focus-visible {
-            outline: 2px solid var(--accent-color);
-            outline-offset: 2px;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body class="antialiased loading">
 
     <!-- Preloader -->
     <div id="preloader">
-        <div class="preloader-logo">KS</div>
+        <div class="loader-bar"></div>
     </div>
     
-    <div class="main-content">
-        <div class="aurora-background">
-            <div class="aurora-shape shape1"></div>
-            <div class="aurora-shape shape2"></div>
-            <div class="aurora-shape shape3"></div>
-        </div>
-        
-        <div class="cursor-dot"></div>
-        <div class="cursor-outline"></div>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 
-        <!-- Header -->
-        <header class="bg-header-bg backdrop-blur-lg fixed top-0 left-0 right-0 z-50 border-b border-card-border" style="background-color: var(--header-bg); border-color: var(--card-border);">
-            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#home" class="text-2xl font-bold text-headings">Karan.</a>
-                <div class="hidden md:flex space-x-6 items-center" role="navigation" aria-label="main navigation">
-                    <a href="#about" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">About</a>
-                    <a href="#services" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Services</a>
-                    <a href="#skills" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Skills</a>
-                    <a href="#experience" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Experience</a>
-                    <a href="#projects" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Projects</a>
-                    <a href="#certifications" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Certifications</a>
-                    <a href="#contact" class="nav-link text-primary hover:text-accent-color font-medium transition-colors" style="color: var(--text-primary);">Contact</a>
-                    <button id="theme-toggle" class="text-xl w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors" aria-label="Toggle theme">
-                        <i id="theme-icon" class="fas fa-moon text-primary" style="color: var(--text-primary);"></i>
-                    </button>
-                </div>
-                <div class="flex items-center md:hidden">
-                    <button id="theme-toggle-mobile" class="text-xl w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors mr-2" aria-label="Toggle theme">
-                        <i id="theme-icon-mobile" class="fas fa-moon text-primary" style="color: var(--text-primary);"></i>
-                    </button>
-                    <button id="mobile-menu-button" class="text-2xl text-headings" aria-label="Open mobile menu" aria-expanded="false">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </nav>
-            <div id="mobile-menu" class="hidden md:hidden glass-card border-t" style="border-color: var(--card-border);">
-                <a href="#about" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">About</a>
-                <a href="#services" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Services</a>
-                <a href="#skills" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Skills</a>
-                <a href="#experience" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Experience</a>
-                <a href="#projects" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Projects</a>
-                <a href="#certifications" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Certifications</a>
-                <a href="#contact" class="block text-sm py-3 px-6 hover:bg-white/5" style="color: var(--text-primary);">Contact</a>
+    <!-- Back to Top Button -->
+    <button id="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Header -->
+    <header class="fixed top-4 left-0 right-0 z-50 flex justify-center">
+        <nav class="bg-gray-900/80 backdrop-blur-lg border border-white/10 rounded-full px-6 py-3 shadow-2xl flex items-center gap-2 md:gap-6 max-w-5xl mx-4 w-full justify-between md:justify-center">
+            
+            <!-- Mobile: Logo on left -->
+            <a href="#home" class="text-xl font-bold text-white md:hidden">KS.</a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-1">
+                <a href="#home" class="nav-link text-sm font-medium text-secondary hover:text-white">Home</a>
+                <a href="#about" class="nav-link text-sm font-medium text-secondary hover:text-white">About</a>
+                <a href="#services" class="nav-link text-sm font-medium text-secondary hover:text-white">Services</a>
+                <a href="#skills" class="nav-link text-sm font-medium text-secondary hover:text-white">Skills</a>
+                <a href="#experience" class="nav-link text-sm font-medium text-secondary hover:text-white">Journey</a>
+                <a href="#projects" class="nav-link text-sm font-medium text-secondary hover:text-white">Work</a>
+                <a href="#certifications" class="nav-link text-sm font-medium text-secondary hover:text-white">Certs</a>
+                <a href="#contact" class="nav-link text-sm font-medium text-secondary hover:text-white">Contact</a>
             </div>
-        </header>
 
-        <main class="container mx-auto px-6">
-            <!-- Hero Section -->
-            <section id="home" class="relative min-h-screen flex items-center justify-center text-center section -mx-6">
-                <div id="three-canvas" class="absolute top-0 left-0 w-full h-full z-1"></div>
-                <div class="relative z-10">
-                    <h1 class="text-4xl md:text-6xl font-extrabold text-headings mb-4 reveal">Hi, I'm Karan Singh J</h1>
-                    <h2 class="text-2xl md:text-4xl font-semibold mb-8 reveal" style="transition-delay: 100ms; color: var(--accent-color);">
-                        <!-- MODIFICATION: Added sr-only span for accessibility -->
-                        <span class="sr-only">I'm a Full Stack Developer, Backend Specialist, and AI Enthusiast</span>
-                        I'm a <span id="typed-text" aria-hidden="true"></span>
-                    </h2>
-                    <div class="space-x-4 reveal" style="transition-delay: 200ms;">
-                        <a href="assets/Karan-Singh-J-Resume.pdf" download class="bg-sky-500 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-sky-600 transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(56,189,248,0.5)]">Download CV</a>
-                        <a href="#contact" class="bg-slate-700 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-slate-600 transition-all transform hover:scale-105 shadow-lg">Let's Talk</a>
-                    </div>
-                </div>
-                <a href="#about" class="scroll-down" aria-label="Scroll to about section">
-                    <i class="fas fa-chevron-down text-3xl opacity-50" style="color: var(--text-headings);"></i>
-                </a>
-            </section>
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-white md:absolute md:right-4">
+                <i id="theme-icon" class="fas fa-moon text-xs"></i>
+            </button>
 
-            <!-- About Section -->
-            <section id="about" class="py-24 section">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">About Me</h2>
-                    <p class="text-secondary mt-2">My introduction</p>
-                </div>
-                <div class="glass-card rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-12 max-w-5xl mx-auto reveal">
-                    <div class="md:w-1/3">
-                        <div class="w-60 h-60 mx-auto rounded-full bg-slate-700 p-2 shadow-lg ring-2 ring-sky-500/50">
-                            <img src="assets/profile-photo.jpg" alt="A professional headshot of Karan Singh J, a Full Stack Developer." class="w-full h-full rounded-full object-cover">
-                        </div>
-                    </div>
-                    <div class="md:w-2/3 text-center md:text-left">
-                        <p class="text-lg text-primary leading-relaxed" style="color: var(--text-primary);">
-                            I’m a passionate Full Stack Developer based in Bengaluru, specializing in designing robust back-end systems and creating dynamic, user-friendly front-end interfaces. With a keen interest in artificial intelligence and prompt engineering, I thrive on solving complex technical challenges and continuously exploring emerging technologies to build innovative, impactful software solutions.
-                        </p>
-                    </div>
-                </div>
-            </section>
+            <!-- Mobile Menu Button -->
+             <button id="mobile-menu-button" class="text-white text-xl md:hidden ml-4">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
 
-            <!-- Services Section -->
-            <section id="services" class="py-24 section">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">What I Do</h2>
-                    <p class="text-secondary mt-2">The value I bring to your team</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                    <!-- Service 1: Backend -->
-                    <div class="glass-card rounded-2xl p-8 text-center reveal">
-                        <i class="fas fa-server text-5xl mb-4" style="color: var(--accent-color);"></i>
-                        <h3 class="text-2xl font-bold text-headings mb-3">Backend Development</h3>
-                        <p class="text-primary mb-4" style="color: var(--text-primary);">Building robust, scalable, and secure server-side applications.</p>
-                        <ul class="text-secondary">
-                            <li>Java & Spring Boot</li>
-                            <li>Microservices</li>
-                            <li>SQL Joins & DB Design</li>
-                        </ul>
-                    </div>
-                     <!-- Service 2: Frontend -->
-                    <div class="glass-card rounded-2xl p-8 text-center reveal">
-                        <i class="fas fa-code text-5xl mb-4" style="color: var(--accent-color);"></i>
-                        <h3 class="text-2xl font-bold text-headings mb-3">Frontend Development</h3>
-                        <p class="text-primary mb-4" style="color: var(--text-primary);">Creating responsive and intuitive user interfaces.</p>
-                        <ul class="text-secondary">
-                            <li>HTML & CSS</li>
-                            <li>JavaScript</li>
-                            <li>React</li>
-                        </ul>
-                    </div>
-                     <!-- Service 3: AI -->
-                    <div class="glass-card rounded-2xl p-8 text-center reveal">
-                        <i class="fas fa-brain text-5xl mb-4" style="color: var(--accent-color);"></i>
-                        <h3 class="text-2xl font-bold text-headings mb-3">AI & Prompt Engineering</h3>
-                        <p class="text-primary mb-4" style="color: var(--text-primary);">Leveraging AI to build innovative and intelligent solutions.</p>
-                        <ul class="text-secondary">
-                            <li>Python for AI</li>
-                            <li>Machine Learning Concepts</li>
-                            <li>AI Model Integration</li>
-                            <li>Prompt Engineering</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden absolute top-20 left-4 right-4 bg-gray-900 border border-white/10 rounded-2xl p-4 flex-col gap-2 shadow-xl md:hidden">
+            <a href="#about" class="block p-3 rounded-lg hover:bg-white/5 text-secondary">About</a>
+            <a href="#services" class="block p-3 rounded-lg hover:bg-white/5 text-secondary">Services</a>
+            <a href="#skills" class="block p-3 rounded-lg hover:bg-white/5 text-secondary">Skills</a>
+            <a href="#projects" class="block p-3 rounded-lg hover:bg-white/5 text-secondary">Projects</a>
+            <a href="#certifications" class="block p-3 rounded-lg hover:bg-white/5 text-secondary">Certifications</a>
+            <a href="#contact" class="block p-3 rounded-lg hover:bg-white/5 text-secondary">Contact</a>
+        </div>
+    </header>
 
-            <!-- Skills Section -->
-            <section id="skills" class="py-24 section">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Core Technologies</h2>
-                    <p class="text-secondary mt-2">The tools I work with</p>
-                </div>
-                <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-java text-6xl text-sky-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">Core Java</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-database text-6xl text-sky-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">SQL</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-html5 text-6xl text-orange-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">HTML & CSS</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-js-square text-6xl text-yellow-300" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">JavaScript</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fab fa-python text-6xl text-green-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">Python</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-robot text-6xl text-purple-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">AI / ML</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-project-diagram text-6xl text-teal-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">OOP</h3></div>
-                    <div class="text-center p-4 reveal glass-card rounded-xl"><i class="fas fa-cogs text-6xl text-gray-400" aria-hidden="true"></i><h3 class="mt-4 font-bold text-lg text-headings">JDBC/Servlets</h3></div>
-                </div>
-            </section>
-
-            <!-- Experience Section -->
-            <section id="experience" class="py-24 section">
-                <div class="text-center mb-20 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Career Journey</h2>
-                    <p class="text-secondary mt-2">My professional experience and education</p>
-                </div>
-                <div id="timeline-container" class="max-w-3xl mx-auto relative pl-4">
-                    <div class="timeline-line"></div>
-                    <h3 class="timeline-item text-2xl font-bold text-headings mb-8 pl-8 relative"><i class="fas fa-briefcase mr-3 text-secondary"></i>Experience</h3>
-                    <article class="timeline-item mb-12 pl-8 relative">
-                        <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
-                        <p class="text-sm font-semibold text-secondary">Dec 2023 - Dec 2024</p>
-                        <h4 class="text-xl font-bold mt-1 text-headings">Assistant Income Tax Verification</h4>
-                        <p class="text-primary font-medium mb-3" style="color: var(--text-primary);">PreciseVision Management Consultancy Services Pvt Ltd (On IBM payroll)</p>
-                        <ul class="list-disc list-inside text-secondary space-y-2">
-                            <li>Verified and validated over 1,000 employee income tax proof submissions with 98% accuracy.</li>
-                            <li>Ensured compliance with payroll regulations and improved record-keeping efficiency by 15%.</li>
-                            <li>Collaborated with the finance team to streamline digital documentation and verification workflows.</li>
-                        </ul>
-                    </article>
-                    <article class="timeline-item mb-12 pl-8 relative">
-                        <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
-                        <p class="text-sm font-semibold text-secondary">Jul 2022 - Jan 2023</p>
-                        <h4 class="text-xl font-bold mt-1 text-headings">Software Engineer</h4>
-                        <p class="text-primary font-medium mb-3" style="color: var(--text-primary);">Scrupulous Enterprises</p>
-                        <ul class="list-disc list-inside text-secondary space-y-2">
-                            <li>Developed scalable microservices using Java and Spring Boot to encapsulate business logic and improve modularity.</li>
-                            <li>Implemented RESTful APIs for efficient CRUD operations integrated with MySQL, optimizing database access and performance.</li>
-                            <li>Enhanced user experience by redesigning web pages with HTML, CSS, and jQuery to dynamically display business statistics and insights.</li>
-                        </ul>
-                    </article>
-
-                    <h3 class="timeline-item text-2xl font-bold text-headings mb-8 mt-16 pl-8 relative"><i class="fas fa-graduation-cap mr-3 text-secondary"></i>Education</h3>
-                     <article class="timeline-item mb-12 pl-8 relative">
-                        <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
-                        <p class="text-sm font-semibold text-secondary">Ongoing - 2026</p>
-                        <h4 class="text-xl font-bold mt-1 text-headings">M.Tech, Computer Science (CGPA : 8.25)</h4>
-                        <p class="text-primary font-medium" style="color: var(--text-primary);">Rajarajeswari College of Engineering</p>
-                    </article>
-                    <article class="timeline-item pl-8 relative">
-                        <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[14px] top-1 border-4" style="border-color: var(--bg-color);"></div>
-                        <p class="text-sm font-semibold text-secondary">Graduated - 2022</p>
-                        <h4 class="text-xl font-bold mt-1 text-headings">B.E, Computer Science (CGPA : 6.96)</h4>
-                        <p class="text-primary font-medium" style="color: var(--text-primary);">Visvesvaraya Technological University</p>
-                    </article>
-                </div>
-            </section>
-
-            <!-- Projects Section -->
-            <section id="projects" class="py-24 section">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Portfolio</h2>
-                    <p class="text-secondary mt-2">Most recent work</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                    <!-- NEW PROJECT CARD ADDED HERE -->
-                    <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer" 
-                        tabindex="0"
-                        data-title="Online Banking System" 
-                        data-img="assets/online-banking-system.jpg" 
-                        data-description="Developed a secure online banking platform using Java, Spring Boot, and Hibernate. Features include user login, fund transfers, transaction tracking, and role-based access control. Includes an Angular-based admin portal." 
-                        data-tech="Java,Spring,MySQL" 
-                        data-github="https://github.com/KaranSinghJ">
-                        <!-- Added fallback/placeholder support for image -->
-                        <img src="assets/online-banking-system.jpg" 
-                             alt="Dashboard of the Online Banking System." 
-                             class="w-full h-56 object-cover pointer-events-none"
-                             onerror="this.src='https://placehold.co/600x400/161b22/c9d1d9?text=Online+Banking'">
-                        <div class="p-6 flex flex-col flex-grow pointer-events-none">
-                            <h3 class="font-bold text-xl mb-2 text-headings">Online Banking System</h3>
-                            <p class="text-primary text-sm mb-4 flex-grow" style="color: var(--text-primary);">A secure, full-stack banking platform with role-based access.</p>
-                             <div class="mt-auto flex justify-between items-center">
-                                <div class="flex flex-wrap gap-2 text-sm"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">Java</span><span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">Spring</span></div>
-                                <span class="text-sky-400 text-2xl"><i class="fab fa-github"></i></span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- MODIFICATION: Added tabindex="0" for keyboard focus -->
-                    <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer" 
-                        tabindex="0"
-                        data-title="QuickBite Food delivery" 
-                        data-img="assets/quickbite.jpg" 
-                        data-description="Built a responsive PWA with JavaScript, HTML5, and Tailwind CSS, including dark mode. Developed backend with Firebase and ASP.NET Core Web API for authentication, carts, profiles, and live order tracking." 
-                        data-tech="ASP.NET Core,Firebase,JavaScript,PWA" 
-                        data-github="https://github.com/KaranSinghJ">
-                        <img src="assets/quickbite.jpg" alt="Illustration of the QuickBite food delivery app." class="w-full h-56 object-cover pointer-events-none">
-                        <div class="p-6 flex flex-col flex-grow pointer-events-none">
-                            <h3 class="font-bold text-xl mb-2 text-headings">QuickBite Food delivery</h3>
-                            <p class="text-primary text-sm mb-4 flex-grow" style="color: var(--text-primary);">A full-stack, responsive food delivery PWA.</p>
-                             <div class="mt-auto flex justify-between items-center">
-                                <div class="flex flex-wrap gap-2 text-sm"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">ASP.NET Core</span><span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">Firebase</span></div>
-                                <span class="text-sky-400 text-2xl"><i class="fab fa-github"></i></span>
-                            </div>
-                        </div>
-                    </article>
-                    <!-- MODIFICATION: Added tabindex="0" for keyboard focus -->
-                    <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer" tabindex="0" data-title="Mental Health Detection" data-img="assets/project-2.jpg" data-description="A machine learning project designed to detect potential mental health issues like depression and anxiety through non-invasive means. The system analyzes speech patterns and biosignals, processing them through a Convolutional Neural Network (CNN) to identify emotional states. This project explores the intersection of AI and healthcare, aiming to provide an early-warning system." data-tech="Machine Learning,CNN,Speech Recognition,Python" data-github="https://github.com/KaranSinghJ">
-                        <img src="assets/project-2.jpg" alt="Conceptual art representing mental health detection through AI." class="w-full h-56 object-cover pointer-events-none">
-                        <div class="p-6 flex flex-col flex-grow pointer-events-none">
-                            <h3 class="font-bold text-xl mb-2 text-headings">Mental Health Detection</h3>
-                            <p class="text-primary text-sm mb-4 flex-grow" style="color: var(--text-primary);">Detects mental health states using ML models and speech recognition.</p>
-                            <div class="mt-auto flex justify-between items-center">
-                                <div class="flex flex-wrap gap-2 text-sm"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">ML</span><span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">CNN</span></div>
-                                <span class="text-sky-400 text-2xl"><i class="fab fa-github"></i></span>
-                            </div>
-                        </div>
-                    </article>
-                    <!-- MODIFICATION: Added tabindex="0" for keyboard focus -->
-                    <article class="project-card glass-card rounded-2xl overflow-hidden group reveal flex flex-col cursor-pointer" tabindex="0" data-title="Proximity Marketing System" data-img="assets/project-3.jpg" data-description="This system delivers targeted advertisements to users based on their proximity to retail locations while prioritizing user privacy. The backend, built with FastAPI and Python, uses machine learning for ad prediction. A ReactJS admin dashboard allows for campaign management, and a smart contract simulator was developed to manage a token-based reward system, ensuring transparency and security." data-tech="FastAPI,ReactJS,Python,Smart Contracts" data-github="https://github.com/KaranSinghJ">
-                        <img src="assets/project-3.jpg" alt="A smartphone displaying a proximity marketing notification." class="w-full h-56 object-cover pointer-events-none">
-                        <div class="p-6 flex flex-col flex-grow pointer-events-none">
-                            <h3 class="font-bold text-xl mb-2 text-headings">Proximity Marketing System</h3>
-                            <p class="text-primary text-sm mb-4 flex-grow" style="color: var(--text-primary);">Privacy-aware marketing with FastAPI, ReactJS, and Smart Contracts.</p>
-                            <div class="mt-auto flex justify-between items-center">
-                                <div class="flex flex-wrap gap-2 text-sm"><span class="bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium">FastAPI</span><span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-medium">ReactJS</span></div>
-                                <span class="text-sky-400 text-2xl"><i class="fab fa-github"></i></span>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
-            <!-- Certifications Section -->
-            <section id="certifications" class="py-24 section">
-                 <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Certifications</h2>
-                    <p class="text-secondary mt-2">My professional credentials</p>
-                </div>
-                <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-                    <article class="glass-card p-6 rounded-xl flex items-start gap-4 reveal">
-                        <i class="fas fa-certificate text-3xl text-sky-400 mt-1" aria-hidden="true"></i>
-                        <div>
-                            <h3 class="font-bold text-lg text-headings">Software Engineering Job Simulation</h3>
-                            <p class="text-secondary text-sm font-semibold mb-2">JPMorgan Chase & Co. (via Forage)</p>
-                            <p class="text-sm text-primary" style="color: var(--text-primary);">Completed practical tasks in Project Setup, Kafka, H2 Integration, and REST API Integration.</p>
-                        </div>
-                    </article>
-                    <article class="glass-card p-6 rounded-xl flex items-start gap-4 reveal">
-                        <i class="fas fa-certificate text-3xl text-sky-400 mt-1" aria-hidden="true"></i>
-                        <div>
-                            <h3 class="font-bold text-lg text-headings">Full Stack Java Developer</h3>
-                            <p class="text-secondary text-sm font-semibold mb-2">JSpiders</p>
-                            <p class="text-sm text-primary" style="color: var(--text-primary);">Covered Core Java, Spring Boot, database management, and building end-to-end web applications.</p>
-                        </div>
-                    </article>
-                    <article class="glass-card p-6 rounded-xl flex items-start gap-4 reveal">
-                        <i class="fas fa-certificate text-3xl text-sky-400 mt-1" aria-hidden="true"></i>
-                        <div>
-                            <h3 class="font-bold text-lg text-headings">Python using AI</h3>
-                            <p class="text-secondary text-sm font-semibold mb-2">AI Techies</p>
-                            <p class="text-sm text-primary" style="color: var(--text-primary);">Applied Python for AI, covering data manipulation, core ML algorithms, and model implementation.</p>
-                        </div>
-                    </article>
-                    <article class="glass-card p-6 rounded-xl flex items-start gap-4 reveal">
-                        <i class="fas fa-certificate text-3xl text-sky-400 mt-1" aria-hidden="true"></i>
-                        <div>
-                            <h3 class="font-bold text-lg text-headings">Android App Development (using Kotlin)</h3>
-                            <p class="text-secondary text-sm font-semibold mb-2">Internshala</p>
-                            <p class="text-sm text-primary" style="color: var(--text-primary);">Focused on modern Android practices, UI/UX design, API integration, and app lifecycle management.</p>
-                        </div>
-                    </article>
-                    <article class="glass-card p-6 rounded-xl flex items-start gap-4 reveal">
-                        <i class="fas fa-certificate text-3xl text-sky-400 mt-1" aria-hidden="true"></i>
-                        <div>
-                            <h3 class="font-bold text-lg text-headings">Artificial Intelligence and Machine Learning</h3>
-                            <p class="text-secondary text-sm font-semibold mb-2">Internshala</p>
-                            <p class="text-sm text-primary" style="color: var(--text-primary);">A foundational course on the principles of AI, ML models, and neural network applications.</p>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
-            <!-- Contact Section -->
-            <section id="contact" class="py-24 section">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl font-bold text-headings">Contact Me</h2>
-                    <p class="text-secondary mt-2">Get in touch</p>
-                </div>
-                <!-- MODIFICATION: Changed max-w-2xl to max-w-5xl and added grid layout -->
-                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-start reveal">
-                    
-                    <!-- New Contact Info Column -->
-                    <div class="flex flex-col gap-8">
-                        <h3 class="text-2xl font-bold text-headings">Reach me directly</h3>
-                        <div class="glass-card rounded-2xl p-6 flex items-center gap-5">
-                            <i class="fas fa-envelope text-3xl text-sky-400"></i>
-                            <div>
-                                <h4 class="text-lg font-semibold text-headings">Email</h4>
-                                <!-- MODIFICATION: Updated email address -->
-                                <a href="mailto:kanukaransinghj01@gmail.com" class="text-primary hover:text-accent-color transition-colors" style="color: var(--text-primary);">kanukaransinghj01@gmail.com</a>
-                            </div>
-                        </div>
-                         <div class="glass-card rounded-2xl p-6 flex items-center gap-5">
-                            <i class="fab fa-linkedin text-3xl text-sky-400"></i>
-                            <div>
-                                <h4 class="text-lg font-semibold text-headings">LinkedIn</h4>
-                                <!-- MODIFICATION: Ensured correct LinkedIn profile link -->
-                                <a href="https://www.linkedin.com/in/karan-singh-j-14ab09204/" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-accent-color transition-colors" style="color: var(--text-primary);">Karan Singh J</a>
-                            </div>
-                        </div>
-                        <!-- MODIFICATION: Added WhatsApp Card -->
-                        <div class="glass-card rounded-2xl p-6 flex items-center gap-5">
-                            <i class="fab fa-whatsapp text-3xl text-green-400"></i>
-                            <div>
-                                <h4 class="text-lg font-semibold text-headings">WhatsApp</h4>
-                                <!-- 
-                                    NOTE: Please replace 910000000000 with your actual 
-                                    WhatsApp number, including your country code (e.g., 91 for India).
-                                -->
-                                <a href="https://wa.me/919343175034" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-accent-color transition-colors" style="color: var(--text-primary);">+91 93431 75034</a>
-                            </div>
-                        </div>
-                         <div class="glass-card rounded-2xl p-6 flex items-center gap-5">
-                            <i class="fas fa-map-marker-alt text-3xl text-sky-400"></i>
-                            <div>
-                                <h4 class="text-lg font-semibold text-headings">Location</h4>
-                                <p class="text-primary" style="color: var(--text-primary);">Bengaluru, Karnataka</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Existing Form Column -->
-                    <div class="glass-card rounded-2xl p-8">
-                        <form id="contact-form" action="https://formspree.io/f/xandankw" method="POST" class="space-y-6">
-                            <div><label for="name" class="sr-only">Your Name</label><input id="name" type="text" name="name" placeholder="Your Name" class="w-full p-4 bg-slate-800 border rounded-lg focus:outline-none focus:ring-2 transition" style="background-color: var(--bg-color); border-color: var(--timeline-border); color: var(--text-primary);" required></div>
-                            <div><label for="email" class="sr-only">Your Email</label><input id="email" type="email" name="email" placeholder="Your Email" class="w-full p-4 bg-slate-800 border rounded-lg focus:outline-none focus:ring-2 transition" style="background-color: var(--bg-color); border-color: var(--timeline-border); color: var(--text-primary);" required></div>
-                            <div><label for="message" class="sr-only">Your Message</label><textarea id="message" name="message" placeholder="Your Message" rows="6" class="w-full p-4 bg-slate-800 border rounded-lg focus:outline-none focus:ring-2 transition" style="background-color: var(--bg-color); border-color: var(--timeline-border); color: var(--text-primary);" required></textarea></div>
-                            <button type="submit" class="w-full bg-sky-500 text-white font-bold py-4 rounded-lg hover:bg-sky-600 transition-all shadow-[0_0_20px_rgba(56,189,248,0.5)]">Send Message</button>
-                            <p id="form-status" class="text-center text-sm mt-4"></p>
-                        </form>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-        <!-- Footer -->
-        <footer class="py-10 mt-20" style="color: var(--text-secondary);">
-             <div class="container mx-auto text-center">
-                 <h3 class="text-2xl font-bold text-headings mb-2">Karan Singh J</h3>
-                 <p class="mb-4">Full Stack Developer</p>
-                 <div class="mb-6"><h4 class="font-semibold text-headings mb-2">Languages</h4><p>English, Hindi, Kannada</p></div>
-                 <div class="flex justify-center space-x-6">
-                     <!-- MODIFICATION: Corrected Footer LinkedIn Link -->
-                     <a href="https://www.linkedin.com/in/karan-singh-j-14ab09204/" target="_blank" rel="noopener noreferrer" class="hover:text-accent-color transition-colors text-2xl" aria-label="View Karan's LinkedIn profile" style="color: var(--text-primary);"><i class="fab fa-linkedin"></i></a>
-                     <a href="https://github.com/KaranSinghJ" target="_blank" rel="noopener noreferrer" class="hover:text-accent-color transition-colors text-2xl" aria-label="View Karan's GitHub profile" style="color: var(--text-primary);"><i class="fab fa-github"></i></a>
-                 </div>
-                 <p class="mt-8 text-sm text-slate-500">&copy; 2025 Karan Singh J. All rights reserved.</p>
-             </div>
-        </footer>
+    <main class="container mx-auto px-6 pt-32 pb-20">
         
-        <!-- Project Modal -->
-        <div id="project-modal-overlay">
-            <div id="project-modal" class="glass-card rounded-2xl p-8 max-w-3xl w-11/12 relative max-h-[90vh] overflow-y-auto">
-                <button id="modal-close-btn" class="absolute top-4 right-5 text-3xl hover:text-headings transition-colors" style="color: var(--text-secondary);" aria-label="Close project details modal">&times;</button>
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="md:w-1/2">
-                        <img id="modal-image" src="" alt="Project screenshot" class="rounded-lg w-full object-cover">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-[85vh] flex flex-col justify-center items-center text-center section relative">
+            <!-- Background Glow Spot -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent-primary opacity-10 blur-[100px] rounded-full pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <div class="inline-block px-3 py-1 rounded-full border border-white/10 bg-white/5 text-accent-primary text-sm font-medium mb-6 reveal">
+                    👋 Welcome to my portfolio
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 reveal" style="transition-delay: 100ms;">
+                    Hi, I'm <span class="gradient-text-accent">Karan Singh J</span>
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-medium text-secondary mb-8 reveal" style="transition-delay: 200ms;">
+                    I build <span id="typed-text" class="text-white"></span>
+                </h2>
+                <div class="flex gap-4 justify-center reveal" style="transition-delay: 300ms;">
+                    <a href="#projects" class="bg-white text-black px-8 py-3.5 rounded-full font-bold text-sm hover:scale-105 transition-transform">View Work</a>
+                    <a href="#contact" class="bg-white/10 text-white px-8 py-3.5 rounded-full font-bold text-sm border border-white/10 hover:bg-white/20 transition-colors">Contact Me</a>
+                </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-secondary opacity-50">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 section">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-3xl md:text-4xl font-bold gradient-text inline-block">About Me</h2>
+                </div>
+                <div class="modern-card p-8 md:p-12 flex flex-col md:flex-row items-center gap-12 reveal">
+                    <div class="md:w-1/3 relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                        <div class="w-48 h-48 mx-auto rounded-full bg-gray-800 p-1 relative">
+                            <img src="assets/profile-photo.jpg" alt="Karan Singh J" class="w-full h-full rounded-full object-cover">
+                        </div>
                     </div>
-                    <div class="md:w-1/2">
-                        <h2 id="modal-title" class="text-3xl font-bold text-headings mb-4"></h2>
-                        <p id="modal-description" class="text-primary mb-6" style="color: var(--text-primary);"></p>
-                        <h3 class="font-semibold text-headings mb-3">Technologies Used:</h3>
-                        <div id="modal-tech-tags" class="flex flex-wrap gap-2 mb-6"></div>
-                        <a id="modal-github-link" href="#" target="_blank" class="inline-block bg-slate-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-slate-600 transition-all"><i class="fab fa-github mr-2"></i>View on GitHub</a>
+                    <div class="md:w-2/3 text-center md:text-left space-y-6">
+                        <p class="text-lg text-secondary leading-relaxed">
+                            I’m a passionate <strong class="text-white">Full Stack Developer</strong> based in Bengaluru. I specialize in building robust back-end systems with <span class="text-accent-primary">Java & Spring Boot</span> and crafting dynamic front-end interfaces.
+                        </p>
+                        <p class="text-lg text-secondary leading-relaxed">
+                            With a keen interest in <strong class="text-white">Artificial Intelligence</strong> and prompt engineering, I love solving complex challenges and turning ideas into scalable software solutions.
+                        </p>
+                        <div class="flex flex-wrap gap-4 justify-center md:justify-start pt-4">
+                            <a href="assets/Karan-Singh-J-Resume.pdf" download class="flex items-center gap-2 text-sm font-bold text-white border-b border-accent-primary pb-1 hover:text-accent-primary transition-colors">
+                                <i class="fas fa-download"></i> Download Resume
+                            </a>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section id="services" class="py-20 section">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold gradient-text inline-block">What I Do</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <!-- Card 1 -->
+                <div class="modern-card p-8 text-center reveal hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-indigo-500/10 rounded-xl flex items-center justify-center mx-auto mb-6 text-indigo-400 text-2xl">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Backend Dev</h3>
+                    <p class="text-secondary text-sm mb-4">Building robust, scalable server-side applications.</p>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">Java</span>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">Spring Boot</span>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">Microservices</span>
+                    </div>
+                </div>
+                 <!-- Card 2 -->
+                 <div class="modern-card p-8 text-center reveal hover:bg-white/5 transition-colors" style="transition-delay: 100ms;">
+                    <div class="w-14 h-14 bg-pink-500/10 rounded-xl flex items-center justify-center mx-auto mb-6 text-pink-400 text-2xl">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Frontend Dev</h3>
+                    <p class="text-secondary text-sm mb-4">Creating responsive and intuitive user interfaces.</p>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">React</span>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">HTML/CSS</span>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">JS</span>
+                    </div>
+                </div>
+                 <!-- Card 3 -->
+                 <div class="modern-card p-8 text-center reveal hover:bg-white/5 transition-colors" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto mb-6 text-purple-400 text-2xl">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">AI Integration</h3>
+                    <p class="text-secondary text-sm mb-4">Leveraging AI models for intelligent solutions.</p>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">Python</span>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">ML Concepts</span>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-400">Prompts</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills (Marquee or Grid? Grid is cleaner) -->
+        <section id="skills" class="py-20 section">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold gradient-text inline-block">Tech Stack</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <!-- Skill Item -->
+                <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fab fa-java text-4xl text-orange-400"></i>
+                    <span class="font-medium text-sm">Java</span>
+                </div>
+                <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fas fa-database text-4xl text-blue-400"></i>
+                    <span class="font-medium text-sm">SQL</span>
+                </div>
+                <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fab fa-python text-4xl text-yellow-300"></i>
+                    <span class="font-medium text-sm">Python</span>
+                </div>
+                <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fab fa-js text-4xl text-yellow-400"></i>
+                    <span class="font-medium text-sm">JavaScript</span>
+                </div>
+                 <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fab fa-html5 text-4xl text-orange-500"></i>
+                    <span class="font-medium text-sm">HTML5</span>
+                </div>
+                <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fas fa-robot text-4xl text-purple-400"></i>
+                    <span class="font-medium text-sm">AI / ML</span>
+                </div>
+                 <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fas fa-project-diagram text-4xl text-teal-400"></i>
+                    <span class="font-medium text-sm">OOP</span>
+                </div>
+                 <div class="modern-card p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors reveal">
+                    <i class="fas fa-leaf text-4xl text-green-500"></i>
+                    <span class="font-medium text-sm">Spring Boot</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience / Timeline -->
+        <section id="experience" class="py-20 section">
+             <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold gradient-text inline-block">Experience</h2>
+            </div>
+            <div class="max-w-3xl mx-auto space-y-8 relative pl-4 md:pl-0">
+                <div class="absolute left-8 md:left-[29px] top-4 bottom-4 w-0.5 bg-gray-800 z-0"></div>
+
+                <!-- Job 1 -->
+                <div class="relative pl-16 reveal">
+                    <div class="absolute left-6 md:left-[21px] top-1 w-4 h-4 bg-accent-primary rounded-full border-4 border-gray-900 z-10"></div>
+                    <div class="modern-card p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white">Assistant Income Tax Verification</h3>
+                            <span class="text-xs font-mono text-accent-primary bg-accent-primary/10 px-2 py-1 rounded self-start">Dec 2023 - Dec 2024</span>
+                        </div>
+                        <p class="text-sm text-secondary mb-4">PreciseVision Management Consultancy (IBM payroll)</p>
+                        <ul class="list-disc list-inside text-sm text-gray-400 space-y-1">
+                            <li>Verified 1,000+ submissions with 98% accuracy.</li>
+                            <li>Improved record-keeping efficiency by 15%.</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Job 2 -->
+                 <div class="relative pl-16 reveal">
+                    <div class="absolute left-6 md:left-[21px] top-1 w-4 h-4 bg-accent-secondary rounded-full border-4 border-gray-900 z-10"></div>
+                    <div class="modern-card p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white">Software Engineer</h3>
+                             <span class="text-xs font-mono text-accent-secondary bg-accent-secondary/10 px-2 py-1 rounded self-start">Jul 2022 - Jan 2023</span>
+                        </div>
+                        <p class="text-sm text-secondary mb-4">Scrupulous Enterprises</p>
+                        <ul class="list-disc list-inside text-sm text-gray-400 space-y-1">
+                            <li>Developed scalable microservices with Java & Spring Boot.</li>
+                            <li>Built RESTful APIs with MySQL integration.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Education Header inside Timeline -->
+                <div class="relative pl-8 reveal pt-8">
+                     <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold gradient-text inline-block">Education</h3>
+                    </div>
+                </div>
+
+                 <!-- Education 1 -->
+                 <div class="relative pl-16 reveal">
+                    <div class="absolute left-6 md:left-[21px] top-1 w-4 h-4 bg-accent-primary rounded-full border-4 border-gray-900 z-10"></div>
+                     <div class="modern-card p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white">M.Tech, Computer Science</h3>
+                             <span class="text-xs font-mono text-accent-primary bg-accent-primary/10 px-2 py-1 rounded self-start">Ongoing - 2026</span>
+                        </div>
+                        <p class="text-sm text-secondary mb-2">Rajarajeswari College of Engineering</p>
+                        <p class="text-sm text-gray-400">CGPA: 8.25</p>
+                    </div>
+                </div>
+                <!-- Education 2 -->
+                <div class="relative pl-16 reveal">
+                    <div class="absolute left-6 md:left-[21px] top-1 w-4 h-4 bg-accent-secondary rounded-full border-4 border-gray-900 z-10"></div>
+                     <div class="modern-card p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white">B.E, Computer Science</h3>
+                             <span class="text-xs font-mono text-accent-secondary bg-accent-secondary/10 px-2 py-1 rounded self-start">Graduated - 2022</span>
+                        </div>
+                        <p class="text-sm text-secondary mb-2">Visvesvaraya Technological University</p>
+                         <p class="text-sm text-gray-400">CGPA: 6.96</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" class="py-20 section">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold gradient-text inline-block">Featured Work</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Project 1 -->
+                 <article class="modern-card group cursor-pointer reveal" onclick="openModal('online')">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="assets/online-banking-system.jpg" alt="Online Banking" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1f2937/FFF?text=Banking+App'">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="bg-white text-black px-4 py-2 rounded-full text-sm font-bold">View Details</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Online Banking System</h3>
+                        <p class="text-secondary text-sm mb-4 line-clamp-2">Secure platform with Java, Spring Boot, and Hibernate.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">Java</span>
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">Spring</span>
+                        </div>
+                    </div>
+                </article>
+                 <!-- Project 2 -->
+                 <article class="modern-card group cursor-pointer reveal" onclick="openModal('quickbite')">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="assets/quickbite.jpg" alt="QuickBite" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1f2937/FFF?text=Food+App'">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="bg-white text-black px-4 py-2 rounded-full text-sm font-bold">View Details</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">QuickBite Delivery</h3>
+                        <p class="text-secondary text-sm mb-4 line-clamp-2">Full-stack food delivery PWA with ASP.NET Core.</p>
+                         <div class="flex flex-wrap gap-2">
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">ASP.NET</span>
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">Firebase</span>
+                        </div>
+                    </div>
+                </article>
+                 <!-- Project 3 -->
+                 <article class="modern-card group cursor-pointer reveal" onclick="openModal('health')">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="assets/project-2.jpg" alt="Mental Health" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1f2937/FFF?text=AI+Health'">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="bg-white text-black px-4 py-2 rounded-full text-sm font-bold">View Details</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Mental Health AI</h3>
+                        <p class="text-secondary text-sm mb-4 line-clamp-2">Detecting emotional states using ML and CNN models.</p>
+                         <div class="flex flex-wrap gap-2">
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">Python</span>
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">ML/CNN</span>
+                        </div>
+                    </div>
+                </article>
+                <!-- Project 4 -->
+                <article class="modern-card group cursor-pointer reveal" onclick="openModal('proximity')">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="assets/project-3.jpg" alt="Proximity Marketing" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1f2937/FFF?text=Proximity+App'">
+                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="bg-white text-black px-4 py-2 rounded-full text-sm font-bold">View Details</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Proximity Marketing</h3>
+                        <p class="text-secondary text-sm mb-4 line-clamp-2">Privacy-aware marketing with FastAPI, ReactJS, and Smart Contracts.</p>
+                         <div class="flex flex-wrap gap-2">
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">FastAPI</span>
+                            <span class="text-xs border border-white/10 px-2 py-1 rounded text-gray-400">ReactJS</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Certifications -->
+        <section id="certifications" class="py-20 section">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold gradient-text inline-block">Certifications</h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <!-- Cert 1 -->
+                <div class="modern-card p-6 flex items-start gap-4 reveal hover:bg-white/5 transition-colors">
+                    <div class="min-w-[3.5rem] h-14 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-400 text-2xl">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Software Engineering Job Simulation</h3>
+                        <p class="text-sm text-accent-primary mb-2">JPMorgan Chase & Co. (via Forage)</p>
+                        <p class="text-sm text-secondary">Completed practical tasks in Project Setup, Kafka, H2 Integration, and REST API Integration.</p>
+                    </div>
+                </div>
+                <!-- Cert 2 -->
+                <div class="modern-card p-6 flex items-start gap-4 reveal hover:bg-white/5 transition-colors">
+                    <div class="min-w-[3.5rem] h-14 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-400 text-2xl">
+                        <i class="fab fa-java"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Full Stack Java Developer</h3>
+                        <p class="text-sm text-accent-primary mb-2">JSpiders</p>
+                        <p class="text-sm text-secondary">Covered Core Java, Spring Boot, database management, and building end-to-end web applications.</p>
+                    </div>
+                </div>
+                <!-- Cert 3 -->
+                <div class="modern-card p-6 flex items-start gap-4 reveal hover:bg-white/5 transition-colors">
+                    <div class="min-w-[3.5rem] h-14 bg-green-500/10 rounded-xl flex items-center justify-center text-green-400 text-2xl">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Python using AI</h3>
+                        <p class="text-sm text-accent-primary mb-2">AI Techies</p>
+                        <p class="text-sm text-secondary">Applied Python for AI, covering data manipulation, core ML algorithms, and model implementation.</p>
+                    </div>
+                </div>
+                <!-- Cert 4 -->
+                <div class="modern-card p-6 flex items-start gap-4 reveal hover:bg-white/5 transition-colors">
+                    <div class="min-w-[3.5rem] h-14 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 text-2xl">
+                        <i class="fab fa-android"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Android App Development</h3>
+                        <p class="text-sm text-accent-primary mb-2">Internshala</p>
+                        <p class="text-sm text-secondary">Focused on modern Android practices, UI/UX design, API integration, and app lifecycle management with Kotlin.</p>
+                    </div>
+                </div>
+                <!-- Cert 5 -->
+                <div class="modern-card p-6 flex items-start gap-4 reveal hover:bg-white/5 transition-colors md:col-span-2">
+                    <div class="min-w-[3.5rem] h-14 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400 text-2xl">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Artificial Intelligence and Machine Learning</h3>
+                        <p class="text-sm text-accent-primary mb-2">Internshala</p>
+                        <p class="text-sm text-secondary">A foundational course on the principles of AI, ML models, and neural network applications.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="py-20 section">
+            <div class="max-w-5xl mx-auto modern-card p-8 md:p-12 reveal">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-4">Let's Connect</h2>
+                        <p class="text-secondary mb-8">Open to freelance work and job opportunities.</p>
+                        
+                        <div class="space-y-6">
+                            <a href="mailto:kanukaransinghj01@gmail.com" class="flex items-center gap-4 p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+                                <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:text-white transition-colors"><i class="fas fa-envelope"></i></div>
+                                <div>
+                                    <p class="text-xs text-secondary">Email</p>
+                                    <p class="text-white font-medium">kanukaransinghj01@gmail.com</p>
+                                </div>
+                            </a>
+                             <a href="https://wa.me/919343175034" target="_blank" class="flex items-center gap-4 p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+                                <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 group-hover:text-white transition-colors"><i class="fab fa-whatsapp"></i></div>
+                                <div>
+                                    <p class="text-xs text-secondary">WhatsApp</p>
+                                    <p class="text-white font-medium">+91 93431 75034</p>
+                                </div>
+                            </a>
+                            <a href="https://www.linkedin.com/in/karan-singh-j-14ab09204/" target="_blank" class="flex items-center gap-4 p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+                                <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:text-white transition-colors"><i class="fab fa-linkedin"></i></div>
+                                <div>
+                                    <p class="text-xs text-secondary">LinkedIn</p>
+                                    <p class="text-white font-medium">Connect Profile</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <form action="https://formspree.io/f/xandankw" method="POST" class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-secondary mb-1">Name</label>
+                            <input type="text" name="name" required class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-accent-primary focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-secondary mb-1">Email</label>
+                            <input type="email" name="email" required class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-accent-primary focus:outline-none transition-colors">
+                        </div>
+                         <div>
+                            <label class="block text-xs text-secondary mb-1">Message</label>
+                            <textarea name="message" rows="4" required class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-accent-primary focus:outline-none transition-colors"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-accent-primary text-white font-bold py-3 rounded-lg hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/30">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-8 border-t border-white/5 mt-12 flex flex-col items-center gap-4">
+            <p class="text-secondary text-sm">© 2025 Karan Singh J.</p>
+            <div class="flex gap-4">
+                 <a href="https://www.linkedin.com/in/karan-singh-j-14ab09204/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent-primary transition-colors text-xl">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://github.com/KaranSinghJ" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent-primary transition-colors text-xl">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Project Modal -->
+    <div id="project-modal-overlay">
+        <div id="project-modal" class="modern-card p-0 max-w-3xl w-11/12 relative max-h-[90vh] overflow-y-auto flex flex-col">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 bg-black/50 rounded-full text-white flex items-center justify-center z-10 hover:bg-black"><i class="fas fa-times"></i></button>
+            <img id="modal-img" src="" class="w-full h-64 object-cover">
+            <div class="p-8">
+                <h2 id="modal-title" class="text-2xl font-bold text-white mb-4">Title</h2>
+                <p id="modal-desc" class="text-secondary mb-6 leading-relaxed">Description</p>
+                <div class="flex gap-4">
+                    <a id="modal-link" href="#" target="_blank" class="bg-white text-black px-6 py-2 rounded-lg font-bold text-sm hover:bg-gray-200">View on GitHub</a>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- JS Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
-
-    <!-- Main Script -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- Function Definitions First ---
-        const sections = document.querySelectorAll('section[id]');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const timelineContainer = document.getElementById('timeline-container');
-
-        function handleScroll() {
-            document.querySelectorAll('.reveal').forEach((el) => {
-                if (el.getBoundingClientRect().top < window.innerHeight - 100) { 
-                    el.classList.add('active'); 
-                }
-            });
-
-            if (timelineContainer && timelineContainer.getBoundingClientRect().top < window.innerHeight - 200) {
-                timelineContainer.querySelector('.timeline-line').classList.add('in-view');
-                timelineContainer.querySelectorAll('.timeline-item').forEach((item, index) => {
-                    setTimeout(() => {
-                        item.classList.add('in-view');
-                    }, index * 200);
-                });
-            }
-
-            let currentSectionId = '';
-            sections.forEach(section => { if (window.scrollY >= section.offsetTop - 85) { currentSectionId = section.id; } });
-            navLinks.forEach(link => { link.classList.remove('active-nav'); if (link.getAttribute('href') === `#${currentSectionId}`) { link.classList.add('active-nav'); } });
-        }
-        
-        // --- Preloader Logic ---
-        const preloader = document.getElementById('preloader');
-        const mainContent = document.querySelector('.main-content');
+        // Preloader
         window.addEventListener('load', () => {
             setTimeout(() => {
-                preloader.classList.add('hidden');
+                document.getElementById('preloader').classList.add('hidden');
                 document.body.classList.remove('loading');
-                mainContent.classList.add('loaded');
-                handleScroll(); // Initial call
-            }, 500);
+            }, 800);
         });
 
-        // --- Theme Toggle ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleMobileBtn = document.getElementById('theme-toggle-mobile');
-        const root = document.documentElement;
-        function applyTheme(theme) {
-            const themeIcon = document.getElementById('theme-icon');
-            const themeIconMobile = document.getElementById('theme-icon-mobile');
-            if (theme === 'light') {
-                root.classList.add('light-mode');
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-                themeIconMobile.classList.replace('fa-moon', 'fa-sun');
-            } else {
-                root.classList.remove('light-mode');
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-                themeIconMobile.classList.replace('fa-sun', 'fa-moon');
-            }
-        }
-        function toggleTheme() {
-            const newTheme = root.classList.contains('light-mode') ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            applyTheme(newTheme);
-        }
-        themeToggleBtn.addEventListener('click', toggleTheme);
-        themeToggleMobileBtn.addEventListener('click', toggleTheme);
-        applyTheme(localStorage.getItem('theme') || 'dark');
-        
-        // --- Custom Cursor ---
+        // Typed JS
+        new Typed('#typed-text', {
+            strings: ['Full Stack Solutions', 'Scalable APIs', 'AI Integrations', 'Modern Web Apps'],
+            typeSpeed: 50,
+            backSpeed: 30,
+            loop: true
+        });
+
+        // Custom Cursor Logic
         const cursorDot = document.querySelector('.cursor-dot');
         const cursorOutline = document.querySelector('.cursor-outline');
         window.addEventListener('mousemove', (e) => {
-            cursorDot.style.left = e.clientX + 'px';
-            cursorDot.style.top = e.clientY + 'px';
-            cursorOutline.style.left = e.clientX + 'px';
-            cursorOutline.style.top = e.clientY + 'px';
-        });
-        document.querySelectorAll('a, button, .project-card').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
-            });
-        });
-
-        // --- Typed.js Initialization ---
-        new Typed('#typed-text', { strings: ['Full Stack Developer', 'Backend Specialist', 'AI Enthusiast'], typeSpeed: 70, backSpeed: 50, loop: true, smartBackspace: true });
-        
-        // --- 3D Tilt Effect ---
-        VanillaTilt.init(document.querySelectorAll(".project-card, .glass-card"), { max: 5, speed: 400, glare: true, "max-glare": 0.1 });
-        
-        // --- Mobile Menu Toggle ---
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            mobileMenuButton.setAttribute('aria-expanded', !mobileMenu.classList.contains('hidden'));
-        });
-        mobileMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-                mobileMenuButton.setAttribute('aria-expanded', 'false');
-            });
-        });
-        
-        // --- Scroll Event Listener ---
-        window.addEventListener('scroll', handleScroll);
-
-        // --- Contact Form ---
-        const form = document.getElementById('contact-form');
-        const formStatus = document.getElementById('form-status');
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const data = new FormData(event.target);
-            try {
-                const res = await fetch(event.target.action, { method: form.method, body: data, headers: {'Accept': 'application/json'} });
-                if (res.ok) {
-                    formStatus.textContent = "Thanks for your submission!";
-                    formStatus.className = 'text-center text-sm mt-4 text-green-400';
-                    form.reset();
-                } else {
-                    formStatus.textContent = "Oops! There was a problem submitting your form.";
-                    formStatus.className = 'text-center text-sm mt-4 text-red-400';
-                }
-            } catch (error) {
-                formStatus.textContent = "Oops! There was a problem submitting your form.";
-                formStatus.className = 'text-center text-sm mt-4 text-red-400';
-            }
-        });
-        
-        // --- Project Modal Logic ---
-        const modalOverlay = document.getElementById('project-modal-overlay');
-        
-        function openModal(data) {
-            document.getElementById('modal-image').src = data.img;
-            document.getElementById('modal-image').alt = `Screenshot of the ${data.title} project.`;
-            document.getElementById('modal-title').textContent = data.title;
-            document.getElementById('modal-description').textContent = data.description;
+            const posX = e.clientX;
+            const posY = e.clientY;
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+            // Add slight delay to outline for organic feel
+            cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
             
-            const techContainer = document.getElementById('modal-tech-tags');
-            techContainer.innerHTML = '';
-            data.tech.split(',').forEach(tech => {
-                const tag = document.createElement('span');
-                tag.className = 'bg-sky-900 text-sky-300 px-3 py-1 rounded-full font-medium text-sm';
-                tag.textContent = tech.trim();
-                techContainer.appendChild(tag);
+            // Spotlight Effect CSS Variable
+            document.querySelectorAll('.modern-card').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Scroll Reveal & Nav Highlight Logic
+        function handleScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(reveal => {
+                const windowHeight = window.innerHeight;
+                const revealTop = reveal.getBoundingClientRect().top;
+                if(revealTop < windowHeight - 100) {
+                    reveal.classList.add('active');
+                }
             });
 
-            const githubLink = document.getElementById('modal-github-link');
-            if (data.github && data.github !== 'none') {
-                githubLink.href = data.github;
-                githubLink.style.display = 'inline-block';
+            // Nav Highlight
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if(scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active-nav');
+                if(link.getAttribute('href').includes(current)) {
+                    link.classList.add('active-nav');
+                }
+            });
+
+            // Back To Top
+            const backToTop = document.getElementById('back-to-top');
+            if(scrollY > 500) {
+                backToTop.classList.add('visible');
             } else {
-                githubLink.style.display = 'none';
+                backToTop.classList.remove('visible');
             }
-            modalOverlay.classList.add('visible');
+        }
+
+        // Listen for scroll events
+        window.addEventListener('scroll', handleScroll);
+        
+        // Trigger once on load to show initial content
+        handleScroll();
+
+        // Back To Top Click
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Mobile Menu
+        const menuBtn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        });
+
+        // Project Data
+        const projects = {
+            'online': {
+                title: 'Online Banking System',
+                img: 'assets/online-banking-system.jpg',
+                desc: 'A comprehensive full-stack banking application built with Java Spring Boot. Features include secure user authentication (Spring Security), role-based access control, fund transfers, and transaction history tracking. The frontend utilizes Thymeleaf for server-side rendering, while an Angular-based admin panel allows for system monitoring.',
+                link: 'https://github.com/KaranSinghJ'
+            },
+            'quickbite': {
+                title: 'QuickBite Food Delivery',
+                img: 'assets/quickbite.jpg',
+                desc: 'A responsive Progressive Web App (PWA) for food delivery. Built with vanilla JavaScript and Tailwind CSS for a fast, native-like mobile experience. The backend is powered by Firebase and ASP.NET Core Web API to handle real-time order tracking, user authentication, and shopping cart management.',
+                link: 'https://github.com/KaranSinghJ'
+            },
+            'health': {
+                title: 'Mental Health Detection AI',
+                img: 'assets/project-2.jpg',
+                desc: 'An innovative machine learning project that analyzes speech patterns and biosignals to detect potential early signs of anxiety and depression. It utilizes a Convolutional Neural Network (CNN) trained on diverse datasets to classify emotional states with high accuracy, aiming to provide non-invasive mental health screening.',
+                link: 'https://github.com/KaranSinghJ'
+            },
+            'proximity': {
+                title: 'Proximity Marketing System',
+                img: 'assets/project-3.jpg',
+                desc: 'This system delivers targeted advertisements to users based on their proximity to retail locations while prioritizing user privacy. The backend, built with FastAPI and Python, uses machine learning for ad prediction. A ReactJS admin dashboard allows for campaign management, and a smart contract simulator was developed to manage a token-based reward system, ensuring transparency and security.',
+                link: 'https://github.com/KaranSinghJ'
+            }
+        };
+
+        function openModal(id) {
+            const data = projects[id];
+            if(!data) return;
+            document.getElementById('modal-img').src = data.img;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.desc;
+            document.getElementById('modal-link').href = data.link;
+            document.getElementById('project-modal-overlay').classList.add('visible');
             document.body.classList.add('modal-open');
         }
-        
+
         function closeModal() {
-            modalOverlay.classList.remove('visible');
+            document.getElementById('project-modal-overlay').classList.remove('visible');
             document.body.classList.remove('modal-open');
         }
-
-        document.querySelectorAll('.project-card').forEach(card => {
-            if(card.dataset.title) {
-                // Add click listener
-                card.addEventListener('click', () => openModal(card.dataset));
-                
-                // Add keydown listener for Enter/Space to trigger click
-                card.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault(); // Prevent space from scrolling
-                        openModal(card.dataset);
-                    }
-                });
+        
+        // Theme Toggle (Simplified for dark-default)
+        const themeBtn = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        
+        themeBtn.addEventListener('click', () => {
+            html.classList.toggle('light-mode');
+            if(html.classList.contains('light-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
             }
         });
-
-        document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('visible')) closeModal(); });
-
-        // --- Three.js Scene ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('three-canvas').appendChild(renderer.domElement);
-        const geometry = new THREE.IcosahedronGeometry(1, 0);
-        const material = new THREE.MeshStandardMaterial({ color: 0x228be6, wireframe: true, roughness: 0.5, metalness: 0.5 });
-        const shape = new THREE.Mesh(geometry, material);
-        scene.add(shape);
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(5, 5, 5);
-        scene.add(light);
-        const ambientLight = new THREE.AmbientLight(0x404040, 2);
-        scene.add(ambientLight);
-        camera.position.z = 3;
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (event) => { mouseX = (event.clientX / window.innerWidth) * 2 - 1; mouseY = -(event.clientY / window.innerHeight) * 2 + 1; });
-        function animate() { requestAnimationFrame(animate); shape.rotation.x += 0.001; shape.rotation.y += 0.001; shape.rotation.x += (mouseY * 0.5 - shape.rotation.x) * 0.05; shape.rotation.y += (mouseX * 0.5 - shape.rotation.y) * 0.05; renderer.render(scene, camera); }
-        animate();
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-    });
     </script>
 </body>
 </html>
